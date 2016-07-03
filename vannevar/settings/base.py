@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # 'compressor',
 
     'blog',
+    'directory',
 ]
 
 MIDDLEWARE_CLASSES = [
