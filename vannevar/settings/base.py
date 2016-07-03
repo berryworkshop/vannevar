@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'blog',
 ]
 
+# just a test.
+
 MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
