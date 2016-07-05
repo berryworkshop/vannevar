@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load wagtailcore_tags %}
+{% load directory_tags %}
 
 {% block body_class %}template-directoryindexpage{% endblock %}
 
@@ -16,4 +17,7 @@
             {% endfor %}
         </ul>
     {% endif %}
+
+    {{ organizations }}
+
 {% endblock %}
