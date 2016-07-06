@@ -18,6 +18,10 @@
         </ul>
     {% endif %}
 
-    {% orgs %}
+    <ul>
+    {% for org in organization_pages %}
+        <li>{{ org.title }}</li>
+    {% endfor %}
+    </ul>
 
 {% endblock %}

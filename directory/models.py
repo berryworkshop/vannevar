@@ -22,6 +22,13 @@ class DirectoryIndexPage(Page):
         InlinePanel('related_links', label="Related links"),
     ]
 
+    def get_context(self, request):
+        # makes me nervous, but: http://stackoverflow.com/questions/32626815/wagtail-views-extra-context
+        context = super(DirectoryIndexPage, self).get_context(request)
+        context['organization_pages'] = OrganizationPage.objects.all()
+        return context
+
+
 class DirectoryIndexRelatedLink(Orderable, RelatedLink):
     page = ParentalKey('DirectoryIndexPage', related_name='related_links')
 
