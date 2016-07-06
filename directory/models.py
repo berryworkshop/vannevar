@@ -63,11 +63,15 @@ class PersonPage(EntityPage):
 
 class OrganizationPage(EntityPage):
     
-    org_types = (
-        ("CORPORATION", "Company"),
-        ("CONSORTIUM", "Consortium"),
-        ("DEPARTMENT", "Department or Unit"),
-    )
+    # org_categories = (
+    #     ("LIBRARY", "Library"),
+    #     ("ARCHIVE", "Archive"),
+    #     ("MUSEUM", "Museum"),
+    #     ("SCHOOL", "School"),
+    #     ("COMPANY", "Company"),
+    #     ("CONSORTIUM", "Consortium"),
+    #     ("DEPARTMENT", "department / unit"),
+    # )
 
     org_scopes = (
         ("INACTIVE", "Inactive/Closed"),
@@ -77,12 +81,12 @@ class OrganizationPage(EntityPage):
         ("INTERNATIONAL", "International"),
     )
 
-    type = models.CharField(max_length=23, choices=org_types, default="CORPORATION")
+    # category = models.MultipleChoiceField(max_length=23, choices=org_categories, default="LIBRARY", blank=False)
     for_profit = models.BooleanField(default=False)
-    scope = models.CharField(max_length=23, choices=org_scopes, default="LOCAL")
+    scope = models.CharField(max_length=23, choices=org_scopes, default="LOCAL", blank=False)
 
     content_panels = EntityPage.content_panels + [
-        FieldPanel('type'),
+        # FieldPanel('category'),
         FieldPanel('for_profit'),
         FieldPanel('scope'),
     ]
