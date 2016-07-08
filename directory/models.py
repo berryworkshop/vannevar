@@ -25,7 +25,7 @@ class DirectoryIndexPage(Page):
     def get_context(self, request):
         # makes me nervous, but: http://stackoverflow.com/questions/32626815/wagtail-views-extra-context
         context = super(DirectoryIndexPage, self).get_context(request)
-        context['organization_pages'] = OrganizationPage.objects.all()
+        context['organization_pages_all'] = OrganizationPage.objects.all()
         return context
 
 
