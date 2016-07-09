@@ -19,8 +19,8 @@
     {% endif %}
 
     <ul>
-    {% for org in organization_pages_all %}
-        <li>{{ org.title }}</li>
+    {% for page in child_pages %}
+      <li>{{ page.title }}</li>
     {% endfor %}
     </ul>
 
