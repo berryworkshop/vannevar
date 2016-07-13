@@ -12,7 +12,7 @@ from wagtail.wagtailadmin.edit_handlers import FieldPanel
 # These models are for general use across various subapps.
 
 class LinkFields(models.Model):
-
+    is_abstract = True
     class Meta:
         abstract = True
 
@@ -43,7 +43,7 @@ class RelatedLink(LinkFields):
     class Meta:
         abstract = True
 
-    title = models.CharField(max_length=255, help_text="Link title")
+    title = models.CharField(max_length=200, help_text="Link title")
 
     panels = [
         FieldPanel('title'),
