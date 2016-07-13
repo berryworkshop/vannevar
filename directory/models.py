@@ -12,6 +12,9 @@ from wagtail.wagtailsearch import index
 from vannevar.models import RelatedLink
 
 
+# 
+# Index Pages
+# # #
 
 class DirectoryIndexPage(Page):
     intro = RichTextField(blank=True)
@@ -25,37 +28,83 @@ class DirectoryIndexRelatedLink(Orderable, RelatedLink):
     page = ParentalKey('DirectoryIndexPage', related_name='related_links')
 
 
+#
+# Attributes
+# # #
+
+class Attribute(models.Model):
+    is_abstract = True
+    class Meta:
+        abstract = True
+
+    CATEGORIES = (
+        ('PRIMARY','primary'),
+        ('SECONDARY','secondary'),
+    )
+    category = models.CharField(max_length=20, choices=CATEGORIES, blank=False, default="PRIMARY")
+    panels = [
+        FieldPanel('category'),
+    ]
+
+
+class RelatedDate(Attribute):
+    is_abstract = True
+    class Meta:
+        abstract = True
+
+    categories = (
+        ('START','start date'),
+        ('END','end date'),
+    )
+    Attribute._meta.get_field('category').choices = categories
+
+    date = models.DateField(default=now)
+    panels = Attribute.panels + [
+        FieldPanel('date'),
+    ]
+
+
+class RelatedPhone(Attribute):
+    is_abstract = True
+    class Meta:
+        abstract = True
+
+    categories = (
+        ('HOME','work phone'),
+        ('WORK','home phone'),
+    )
+    Attribute._meta.get_field('category').choices = categories
+
+    number = models.CharField(max_length=50)
+    panels = Attribute.panels + [
+        FieldPanel('number'),
+    ]
+
+
+
+
+# 
+# Item Pages
+# # #
+
 class ItemPage(Page):
     is_abstract = True
     class Meta:
         abstract = True
 
 
-class RelatedDate(models.Model):
-    is_abstract = True
-    class Meta:
-        abstract = True
-    CATEGORIES = (
-        ('START','start date'),
-        ('END','end date'),
-    )
-    date = models.DateField(default=now)
-    category = models.CharField(max_length=20, choices=CATEGORIES, blank=False, default="START")
-
-    panels = [
-        FieldPanel('category'),
-        FieldPanel('date'),
-    ]
-
-
-class OrganizationPageRelatedDates(Orderable, RelatedDate):
-    page = ParentalKey('directory.OrganizationPage', related_name='related_dates')
-
 
 class EntityPage(Page):
     is_abstract = True
     class Meta:
         abstract = True
+
+
+class OrganizationPageRelatedDates(Orderable, RelatedDate):
+    page = ParentalKey('directory.OrganizationPage', related_name='related_dates')
+
+class OrganizationPageRelatedPhones(Orderable, RelatedPhone):
+    page = ParentalKey('directory.OrganizationPage', related_name='related_phones')
 
 
 class OrganizationPage(EntityPage):
@@ -90,9 +139,16 @@ class OrganizationPage(EntityPage):
         FieldPanel('for_profit'),
         FieldPanel('scope'),
         InlinePanel('related_dates', label="Related Dates" ),
+        InlinePanel('related_phones', label="Related Phones" ),
 
     ]
 
+
+class PersonPageRelatedDates(Orderable, RelatedDate):
+    page = ParentalKey('directory.PersonPage', related_name='related_dates')
+
+class PersonPageRelatedPhones(Orderable, RelatedDate):
+    page = ParentalKey('directory.PersonPage', related_name='related_phones')
 
 class PersonPage(EntityPage):
     name_last = models.CharField(max_length=255, verbose_name="First Name")
@@ -108,3 +164,11 @@ class PersonPage(EntityPage):
 #     is_abstract = True
 #     class Meta:
 #         abstract = True
+
+
+#
+# Misc. Tables
+# # #
+
+class Citation(models.Model):
+    pass

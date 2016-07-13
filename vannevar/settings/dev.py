@@ -31,9 +31,6 @@ class SuppressDeprecated(logging.Filter):
         # Return false to suppress message.
         return not any([warn in record.getMessage() for warn in WARNINGS_TO_SUPPRESS])
 
-
-
-
 try:
     from .local import *
 except ImportError:
