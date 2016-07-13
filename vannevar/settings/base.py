@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'blog',
     'directory',
+    'collection',
 ]
 
 MIDDLEWARE_CLASSES = [
