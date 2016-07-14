@@ -6,13 +6,7 @@ class Item(models.Model):
     class Meta:
         abstract=True
 
-    dates = models.ManyToManyField('Date')
-
-
-class Source(models.Model):
-    description = models.TextField()
-    url = models.URLField()
-    accessed = models.DateField(default=now)
+    dates = models.ManyToManyField('DateAttr', blank=True)
 
 
 class Color(models.Model):
@@ -24,32 +18,53 @@ class Color(models.Model):
 
 
 #
-# Attributes
+# Mixins
 # # #
 
-class Attribute(models.Model):
+class SourceMixin(models.Model):
     class Meta:
         abstract=True
 
-    source = models.ForeignKey('Source', blank=True, null=True)
+    source = models.TextField(blank=True)
+    source_url = models.URLField(blank=True)
+    source_accessed = models.DateField(default=now)
 
 
-class Date(Attribute):
+#
+# Attributes
+# # #
+
+class Attribute(SourceMixin, models.Model):
+    class Meta:
+        abstract=True
+
+
+class OrganizationNameAttr(Attribute):
+    name = models.CharField(max_length=200)
+    organization = models.ForeignKey('Organization', related_name="names")
+
+    def __str__(self):
+        return self.name
+
+
+class DateAttr(Attribute):
     # TODO: perhaps refactor with http://stackoverflow.com/a/849426/652626
     # at least year needs not be naïve (BCE), and validation unique together
-    year = models.IntegerField(blank=False)
-    month = models.IntegerField(blank=True, null=True)
-    day = models.IntegerField(blank=True, null=True)
+    year = models.IntegerField()
+    month = models.IntegerField(null=True, blank=True)
+    day = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return "{}-{}-{}".format(self.year, self.month, self.day)
 
 
-class Name(Attribute):
-    name = models.CharField(max_length=200, blank=False, null=False)
+class PlaceAttr(Attribute):
+    longitude = models.DecimalField(max_digits=6, decimal_places=3)
+    latitude = models.DecimalField(max_digits=6, decimal_places=3)
 
     def __str__(self):
-        return self.name
+        return "{}-{}-{}".format(self.longitude, self.latitude)
+
 
 
 #
@@ -62,12 +77,12 @@ class Entity(Item):
 
 
 class Organization(Entity):
-    name = models.ForeignKey('Name')
+    pass
 
 
 class Person(Entity):
-    name_last  = models.CharField(max_length=200, blank=False, null=False)
-    name_first = models.CharField(max_length=200, blank=True, null=True)
+    name_last  = models.CharField(max_length=200)
+    name_first = models.CharField(max_length=200, blank=True)
 
 
 #
