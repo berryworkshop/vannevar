@@ -34,6 +34,7 @@ class Color(Item):
 
 
 class Source(Item):
+    body = models.TextField(blank=True)
     url = models.URLField()
 
 
@@ -45,9 +46,19 @@ class Attribute(models.Model):
     class Meta:
         abstract=True
 
+    # fields for classification
+    CATEGORIES = [
+        ('PRIMARY','Primary'),
+        ('SECONDARY','Secondary'),
+    ]
+    category = models.CharField(
+        max_length=50, 
+        choices=CATEGORIES,
+        default='PRIMARY',
+    )
+
     # fields for citation
     source = models.ForeignKey('Source', blank=True)
-    source_accessed = models.DateField(default=now)
 
     # fields for presentation
     sequence = models.PositiveIntegerField(default=0)
@@ -66,11 +77,7 @@ class Attribute(models.Model):
 
 
 class DateAttr(Attribute):
-    # TODO: perhaps refactor with http://stackoverflow.com/a/849426/652626
-    # at least year needs not be naïve (BCE), and validation unique together
-    year = models.IntegerField()
-    month = models.IntegerField(null=True, blank=True)
-    day = models.IntegerField(null=True, blank=True)
+    date = models.DateField(default=now)
 
     def __str__(self):
         return "{}-{}-{}".format(self.year, self.month, self.day)
