@@ -1,50 +1,68 @@
 from django.db import models
 from django.utils.timezone import now
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
 
 class Item(models.Model):
     class Meta:
         abstract=True
 
-    dates = models.ManyToManyField('DateAttr', blank=True)
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200)
+
+    # fields for (receiving) generic relations
+    dates = GenericRelation('DateAttr',
+        related_query_name="%(class)s",
+        )
+    descriptions = GenericRelation('DescriptionAttr',
+        related_query_name="%(class)s",
+        )
+
+    def __str__(self):
+        return self.name
 
 
-class Color(models.Model):
-    name = models.CharField(max_length=50)
+class Color(Item):
     hue = models.DecimalField(max_digits=6, decimal_places=3)
     saturation = models.DecimalField(max_digits=6, decimal_places=3)
     lightness = models.DecimalField(max_digits=6, decimal_places=3)
     alpha = models.DecimalField(max_digits=4, decimal_places=3)
 
+    def __str__(self):
+        return self.name
 
-#
-# Mixins
-# # #
 
-class SourceMixin(models.Model):
-    class Meta:
-        abstract=True
-
-    source = models.TextField(blank=True)
-    source_url = models.URLField(blank=True)
-    source_accessed = models.DateField(default=now)
+class Source(Item):
+    url = models.URLField()
 
 
 #
 # Attributes
 # # #
 
-class Attribute(SourceMixin, models.Model):
+class Attribute(models.Model):
     class Meta:
         abstract=True
 
+    # fields for citation
+    source = models.ForeignKey('Source', blank=True)
+    source_accessed = models.DateField(default=now)
 
-class OrganizationNameAttr(Attribute):
-    name = models.CharField(max_length=200)
-    organization = models.ForeignKey('Organization', related_name="names")
+    # fields for presentation
+    sequence = models.PositiveIntegerField(default=0)
+
+    # fields for generic relations
+    content_type = models.ForeignKey(ContentType,
+        on_delete = models.CASCADE,
+        default = ContentType.objects.get(
+            app_label="collection", model="organization").pk
+        )
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
-        return self.name
+        return 'sequence: {}'.format(self.sequence)
 
 
 class DateAttr(Attribute):
@@ -58,13 +76,11 @@ class DateAttr(Attribute):
         return "{}-{}-{}".format(self.year, self.month, self.day)
 
 
-class PlaceAttr(Attribute):
-    longitude = models.DecimalField(max_digits=6, decimal_places=3)
-    latitude = models.DecimalField(max_digits=6, decimal_places=3)
+class DescriptionAttr(Attribute):
+    body = models.TextField()
 
     def __str__(self):
-        return "{}-{}-{}".format(self.longitude, self.latitude)
-
+        return "{}-{}-{}".format(self.year, self.month, self.day)
 
 
 #
@@ -74,6 +90,7 @@ class PlaceAttr(Attribute):
 class Entity(Item):
     class Meta:
         abstract=True
+    pass
 
 
 class Organization(Entity):

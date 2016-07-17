@@ -1,28 +1,43 @@
 from django.contrib import admin
-from collection.models import Organization, Person, Tool, DateAttr, OrganizationNameAttr, PlaceAttr
-from django.forms import Textarea, URLInput
-from django.db import models
+from django.contrib.contenttypes.admin import GenericTabularInline
+from collection.models import (
+    Organization, Person, Tool, DateAttr, DescriptionAttr,
+    )
 
-class OrganizationNameAttrInline(admin.TabularInline):
-    model = OrganizationNameAttr
-    fields = ['name', 'source', 'source_url', 'source_accessed']
-    extra = 1
-    formfield_overrides = {
-        models.TextField: {'widget': Textarea(attrs={'rows':2, 'cols':40})},
-        models.URLField: {'widget': URLInput(attrs={'rows':1, 'cols':40})},
-    }
+#
+# Inlines
+# # #
 
+class DateAttrInline(GenericTabularInline):
+    model = DateAttr
+    extra = 0
+
+
+class DescriptionAttrInline(GenericTabularInline):
+    model = DescriptionAttr
+    extra = 0
+
+
+#
+# Admins
+# # #
 
 class OrganizationAdmin(admin.ModelAdmin):
-    fields = ['dates']
-    inlines = [OrganizationNameAttrInline]
+    inlines = [
+        DateAttrInline, DescriptionAttrInline
+    ]
 
 
+class PersonAdmin(admin.ModelAdmin):
+    inlines = [
+        DateAttrInline, DescriptionAttrInline
+    ]
+
+
+#
+# Registration
+# # #
 
 admin.site.register(Organization, OrganizationAdmin)
-admin.site.register(Person)
+admin.site.register(Person, PersonAdmin)
 admin.site.register(Tool)
-
-admin.site.register(DateAttr)
-admin.site.register(OrganizationNameAttr)
-admin.site.register(PlaceAttr)
