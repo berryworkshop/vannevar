@@ -37,6 +37,9 @@ class BlogPage(Page):
     ]
 
 
+class BlogIndexRelatedLink(Orderable, RelatedLink):
+    page = ParentalKey('BlogIndexPage', related_name='related_links')
+
 class BlogIndexPage(Page):
     intro = RichTextField(blank=True)
 
@@ -44,6 +47,3 @@ class BlogIndexPage(Page):
         FieldPanel('intro', classname="full"),
         InlinePanel('related_links', label="Related links"),
     ]
-
-class BlogIndexRelatedLink(Orderable, RelatedLink):
-    page = ParentalKey('BlogIndexPage', related_name='related_links')
