@@ -45,15 +45,15 @@ class Source(Item):
 class Attribute(models.Model):
     class Meta:
         abstract=True
+        ordering = ['sequence', 'id']
 
     # fields for classification
-    CATEGORIES = [
-        ('PRIMARY','Primary'),
-        ('SECONDARY','Secondary'),
+    categories = [
+        ('MAIN','Main'),
     ]
     category = models.CharField(
         max_length=50, 
-        choices=CATEGORIES,
+        choices=categories,
         default='PRIMARY',
     )
 
@@ -82,6 +82,14 @@ class DateAttr(Attribute):
     def __str__(self):
         return "{}-{}-{}".format(self.year, self.month, self.day)
 
+# override categories
+date_categories = (
+    ('BEGIN','Begin Date'),
+    ('END','End Date'),
+    ('ACCESSED','Last Accessed Date'),
+)
+DateAttr._meta.get_field('category').choices = date_categories
+
 
 class DescriptionAttr(Attribute):
     body = models.TextField()
@@ -89,6 +97,13 @@ class DescriptionAttr(Attribute):
     def __str__(self):
         return "{}-{}-{}".format(self.year, self.month, self.day)
 
+# # override categories
+# description_categories = (
+#     ('BEGIN','Begin Date'),
+#     ('END','End Date'),
+#     ('ACCESSED','Last Accessed Date'),
+# )
+# DescriptionAttr._meta.get_field('category').choices = description_categories
 
 #
 # Entities

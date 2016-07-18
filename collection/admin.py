@@ -10,12 +10,12 @@ from collection.models import (
 
 class DateAttrInline(GenericTabularInline):
     model = DateAttr
-    extra = 0
+    extra = 1
 
 
 class DescriptionAttrInline(GenericTabularInline):
     model = DescriptionAttr
-    extra = 0
+    extra = 1
 
 
 #
