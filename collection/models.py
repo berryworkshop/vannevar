@@ -97,13 +97,13 @@ class DescriptionAttr(Attribute):
     def __str__(self):
         return "{}-{}-{}".format(self.year, self.month, self.day)
 
-# # override categories
-# description_categories = (
-#     ('BEGIN','Begin Date'),
-#     ('END','End Date'),
-#     ('ACCESSED','Last Accessed Date'),
-# )
-# DescriptionAttr._meta.get_field('category').choices = description_categories
+# override categories
+description_categories = (
+    ('BEGIN','Begin Date'),
+    ('END','End Date'),
+    ('ACCESSED','Last Accessed Date'),
+)
+DescriptionAttr._meta.get_field('category').choices = description_categories
 
 #
 # Entities
