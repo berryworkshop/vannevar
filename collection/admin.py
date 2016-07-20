@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from collection.models import (
-    Organization, Person, Tool, Source, DateAttr, DescriptionAttr,
+    Organization, Person, DateAttr, DescriptionAttr, Work
     )
 
 #
@@ -9,32 +9,49 @@ from collection.models import (
 # # #
 
 class DateAttrInline(GenericTabularInline):
+    verbose_name = 'date'
+    verbose_name_plural = 'dates'
     model = DateAttr
-    extra = 1
+    extra = 0
+    fields = [
+        'category', 'date', 'source', 'source_accessed',
+    ]
 
 
 class DescriptionAttrInline(GenericTabularInline):
     model = DescriptionAttr
-    extra = 1
+    extra = 0
+    fields = [
+        'body', 'source', 'source_accessed',
+    ]
 
 
 #
 # Admins
 # # #
 
-class ItemAdmin(admin.ModelAdmin):
+class StandardInlineMixin(admin.ModelAdmin):
     inlines = [
         DateAttrInline,
         DescriptionAttrInline
-        ]
+    ]
+
+class OrganizationAdmin(StandardInlineMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ['name']}
+
+
+class PersonAdmin(StandardInlineMixin, admin.ModelAdmin):
+    prepopulated_fields = {'slug': ['name_last', 'name_first']}
+
+
+class WorkAdmin(StandardInlineMixin, admin.ModelAdmin):
+    prepopulated_fields = {'slug': ['title']}
 
 
 #
 # Registration
 # # #
 
-admin.site.register(Organization, ItemAdmin)
-admin.site.register(Person, ItemAdmin)
-admin.site.register(Tool, ItemAdmin)
-admin.site.register(Source, ItemAdmin)
+admin.site.register(Organization, OrganizationAdmin)
+admin.site.register(Person, PersonAdmin)
+admin.site.register(Work, WorkAdmin)

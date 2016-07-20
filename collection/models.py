@@ -4,12 +4,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
 
+#
+# Main
+# # #
+
+
 class Item(models.Model):
     class Meta:
-        abstract=True
-
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200)
+        abstract = True
 
     # fields for (receiving) generic relations
     dates = GenericRelation('DateAttr',
@@ -18,24 +20,6 @@ class Item(models.Model):
     descriptions = GenericRelation('DescriptionAttr',
         related_query_name="%(class)s",
         )
-
-    def __str__(self):
-        return self.name
-
-
-class Color(Item):
-    hue = models.DecimalField(max_digits=6, decimal_places=3)
-    saturation = models.DecimalField(max_digits=6, decimal_places=3)
-    lightness = models.DecimalField(max_digits=6, decimal_places=3)
-    alpha = models.DecimalField(max_digits=4, decimal_places=3)
-
-    def __str__(self):
-        return self.name
-
-
-class Source(Item):
-    body = models.TextField(blank=True)
-    url = models.URLField()
 
 
 #
@@ -46,19 +30,6 @@ class Attribute(models.Model):
     class Meta:
         abstract=True
         ordering = ['sequence', 'id']
-
-    # fields for classification
-    categories = [
-        ('MAIN','Main'),
-    ]
-    category = models.CharField(
-        max_length=50, 
-        choices=categories,
-        default='PRIMARY',
-    )
-
-    # fields for citation
-    source = models.ForeignKey('Source', blank=True)
 
     # fields for presentation
     sequence = models.PositiveIntegerField(default=0)
@@ -72,38 +43,44 @@ class Attribute(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    # fields for citation
+    source = models.ForeignKey('Work', blank=True, null=True)
+    source_accessed = models.DateField(default=now, blank=True)
+
     def __str__(self):
-        return 'sequence: {}'.format(self.sequence)
+        return '{} #{}'.format(self.name, self.sequence)
 
 
 class DateAttr(Attribute):
+    class Meta:
+        verbose_name = 'date'
+        verbose_name_plural = 'dates'
+
     date = models.DateField(default=now)
 
+    categories = (
+        ('INCORPORATED', 'Incorporation'),
+        ('TERMINATED', 'Termination'),
+        ('BEGUN', 'Birth'),
+        ('ENDED', 'Death'),
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=categories,
+    )
+
     def __str__(self):
-        return "{}-{}-{}".format(self.year, self.month, self.day)
-
-# override categories
-date_categories = (
-    ('BEGIN','Begin Date'),
-    ('END','End Date'),
-    ('ACCESSED','Last Accessed Date'),
-)
-DateAttr._meta.get_field('category').choices = date_categories
-
+        return str(self.date)
 
 class DescriptionAttr(Attribute):
+    class Meta:
+        verbose_name = 'description'
+        verbose_name_plural = 'descriptions'
+
     body = models.TextField()
 
     def __str__(self):
-        return "{}-{}-{}".format(self.year, self.month, self.day)
-
-# override categories
-description_categories = (
-    ('BEGIN','Begin Date'),
-    ('END','End Date'),
-    ('ACCESSED','Last Accessed Date'),
-)
-DescriptionAttr._meta.get_field('category').choices = description_categories
+        return self.body[:50]
 
 #
 # Entities
@@ -116,22 +93,45 @@ class Entity(Item):
 
 
 class Organization(Entity):
-    pass
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 
 class Person(Entity):
+    class Meta:
+        verbose_name_plural = 'people'
+
     name_last  = models.CharField(max_length=200)
     name_first = models.CharField(max_length=200, blank=True)
+    slug = models.SlugField(max_length=200)
 
+    def __str__(self):
+        return '{}, {}'.format(self.name_last, self.name_first)
 
 #
 # Works
 # # #
 
 class Work(Item):
-    class Meta:
-        abstract=True
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200)
 
+    def __str__(self):
+        return self.name
 
-class Tool(Work):
-    pass
+    categories = (
+        ('WEBSITE', 'Website'),
+        ('BOOK', 'Book'),
+        ('TOOL', 'Tool'),
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=categories,
+        default='WEBSITE',
+    )
+
+    def __str__(self):
+        return '{}, {}'.format(self.category, self.title)
