@@ -13,44 +13,21 @@ class Base(models.Model):
     class Meta:
         abstract = True
 
+    slug = models.SlugField(max_length=200)
     created = models.DateTimeField('Created', auto_now_add=True)
     modified = models.DateTimeField('Modified', auto_now=True)
 
     def __str__(self):
-        return '{} [{}]' % (self.__class__.__name__, self.id)
+        return '{} {}: {}' % (self.__class__.__name__, self.id, self.slug)
 
     def to_json(self, include_related=True):
         return {
             'id': self.id,
+            'slug': self.slug,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
-            'class_name': self.__class__.__name__
+            'class_name': self.__class__.__name__,
         }
-
-    def cast(self):
-        '''
-        hat tip: http://stackoverflow.com/a/13306529/652626
-        Cconverts "self" into its correct child class. For example:
-
-           class Fruit(models.Model):
-               name = models.CharField()
-
-           class Apple(Fruit):
-               pass
-
-           fruit = Fruit.objects.get(name='Granny Smith')
-           apple = fruit.cast()
-
-        :return self: A casted child class of self
-        '''
-        for name in dir(self):
-            try:
-                attr = getattr(self, name)
-                if isinstance(attr, self.__class__):
-                    return attr
-            except:
-                pass
-        return self
 
 
 class Item(Base):
@@ -131,22 +108,73 @@ class DescriptionAttr(Attribute):
 # # #
 
 class Entity(Item):
-    members = models.ManyToManyField('Entity',
-        through='Membership',
-        through_fields=('parent', 'child'),
-        symmetrical=False
-    )
-
-    def __str__(self):
-        return self.cast().__str__()
+    class Meta:
+        abstract = True
 
 
 class Organization(Entity):
     name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200)
+
+    related_organizations = models.ManyToManyField('Organization',
+        through='OrgOrgRelationship',
+        through_fields=('parent', 'child'),
+        symmetrical=False
+    )
     
+    related_people = models.ManyToManyField('Person',
+        through='OrgPersonRelationship',
+        through_fields=('parent', 'child'),
+        symmetrical=False,
+        related_name='organizations'
+    )
+
     def __str__(self):
         return self.name
+
+
+class OrgOrgRelationship(models.Model):
+    class Meta:
+        verbose_name='organization relationship'
+
+    parent = models.ForeignKey('Organization',
+        on_delete=models.CASCADE,
+        related_name='parents'
+    )
+    child = models.ForeignKey('Organization',
+        on_delete=models.CASCADE,
+        related_name='children'
+    )
+    categories = (
+        ('DEPARTMENT', 'Department'),
+        ('MEMBER', 'Member'),
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=categories,
+        default='DEPARTMENT',
+    )
+
+
+class OrgPersonRelationship(models.Model):
+    class Meta:
+        verbose_name='member'
+
+    parent = models.ForeignKey('Organization',
+        on_delete=models.CASCADE,
+        related_name='organizations'
+    )
+    child = models.ForeignKey('Person',
+        on_delete=models.CASCADE,
+        related_name='people'
+    )
+    categories = (
+        ('EMPLOYEE', 'Employee'),
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=categories,
+        default='EMPLOYEE',
+    )
 
 
 class Person(Entity):
@@ -155,36 +183,12 @@ class Person(Entity):
 
     name_last  = models.CharField(max_length=200)
     name_first = models.CharField(max_length=200, blank=True)
-    slug = models.SlugField(max_length=200)
 
     def __str__(self):
         return '{}, {}'.format(self.name_last, self.name_first)
 
 
-class Membership(models.Model):
-    parent = models.ForeignKey('Entity',
-        on_delete=models.CASCADE,
-        related_name='parents'
-    )
-    child = models.ForeignKey('Entity',
-        on_delete=models.CASCADE,
-        related_name='children'
-    )
 
-    roles = (
-        ('DEPARTMENT', 'Department'),
-        ('EMPLOYEE', 'Employee'),
-        ('MEMBER', 'Member'),
-    )
-    role = models.CharField(
-        max_length=50,
-        choices=roles,
-        default='DEPARTMENT',
-    )
-
-    dates = GenericRelation('DateAttr',
-        related_query_name="%(class)s",
-    )
 
 
 #
@@ -193,7 +197,6 @@ class Membership(models.Model):
 
 class Work(Item):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200)
 
     def __str__(self):
         return self.name

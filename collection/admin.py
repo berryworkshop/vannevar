@@ -30,15 +30,25 @@ class DescriptionAttrInline(GenericTabularInline):
         'body', 'source', 'source_accessed',
     ]
 
-class ChildInline(admin.TabularInline):
-    model = Entity.members.through
+class OrgChildInline(admin.TabularInline):
+    verbose_name='sub-organization'
+    model = Organization.related_organizations.through
     extra = 0
     fk_name = 'child'
 
-class ParentInline(admin.TabularInline):
-    model = Entity.members.through
+class OrgParentInline(admin.TabularInline):
+    verbose_name='super-organization'
+    model = Organization.related_organizations.through
     extra = 0
     fk_name = 'parent'
+
+class OrgChildPersonInline(admin.TabularInline):
+    model = Organization.related_people.through
+    extra = 0
+
+class PersonParentOrgInline(admin.TabularInline):
+    model = Person.organizations.through
+    extra = 0
 
 
 #
@@ -47,12 +57,14 @@ class ParentInline(admin.TabularInline):
 
 
 class OrganizationAdmin(admin.ModelAdmin):
+    fields = ['name', 'slug']
     prepopulated_fields = {'slug': ['name']}
     inlines = [
         DateAttrInline,
         DescriptionAttrInline,
-        ChildInline,
-        ParentInline,
+        OrgChildInline,
+        OrgParentInline,
+        OrgChildPersonInline,
     ]
 
 
@@ -61,6 +73,7 @@ class PersonAdmin(admin.ModelAdmin):
     inlines = [
         DateAttrInline,
         DescriptionAttrInline,
+        PersonParentOrgInline,
     ]
 
 class WorkAdmin(admin.ModelAdmin):
