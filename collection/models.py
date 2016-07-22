@@ -9,7 +9,51 @@ from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKe
 # # #
 
 
-class Item(models.Model):
+class Base(models.Model):
+    class Meta:
+        abstract = True
+
+    created = models.DateTimeField('Created', auto_now_add=True)
+    modified = models.DateTimeField('Modified', auto_now=True)
+
+    def __str__(self):
+        return '{} [{}]' % (self.__class__.__name__, self.id)
+
+    def to_json(self, include_related=True):
+        return {
+            'id': self.id,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
+            'class_name': self.__class__.__name__
+        }
+
+    def cast(self):
+        '''
+        hat tip: http://stackoverflow.com/a/13306529/652626
+        Cconverts "self" into its correct child class. For example:
+
+           class Fruit(models.Model):
+               name = models.CharField()
+
+           class Apple(Fruit):
+               pass
+
+           fruit = Fruit.objects.get(name='Granny Smith')
+           apple = fruit.cast()
+
+        :return self: A casted child class of self
+        '''
+        for name in dir(self):
+            try:
+                attr = getattr(self, name)
+                if isinstance(attr, self.__class__):
+                    return attr
+            except:
+                pass
+        return self
+
+
+class Item(Base):
     class Meta:
         abstract = True
 
@@ -40,7 +84,7 @@ class Attribute(models.Model):
         default = ContentType.objects.get(
             app_label="collection", model="organization").pk
         )
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
     # fields for citation
@@ -51,6 +95,7 @@ class Attribute(models.Model):
         return '{} #{}'.format(self.name, self.sequence)
 
 
+
 class DateAttr(Attribute):
     class Meta:
         verbose_name = 'date'
@@ -59,10 +104,8 @@ class DateAttr(Attribute):
     date = models.DateField(default=now)
 
     categories = (
-        ('INCORPORATED', 'Incorporation'),
-        ('TERMINATED', 'Termination'),
-        ('BEGUN', 'Birth'),
-        ('ENDED', 'Death'),
+        ('START', 'Start'),
+        ('END', 'End'),
     )
     category = models.CharField(
         max_length=50,
@@ -71,6 +114,7 @@ class DateAttr(Attribute):
 
     def __str__(self):
         return str(self.date)
+
 
 class DescriptionAttr(Attribute):
     class Meta:
@@ -87,15 +131,20 @@ class DescriptionAttr(Attribute):
 # # #
 
 class Entity(Item):
-    class Meta:
-        abstract=True
-    pass
+    members = models.ManyToManyField('Entity',
+        through='Membership',
+        through_fields=('parent', 'child'),
+        symmetrical=False
+    )
+
+    def __str__(self):
+        return self.cast().__str__()
 
 
 class Organization(Entity):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
-
+    
     def __str__(self):
         return self.name
 
@@ -110,6 +159,33 @@ class Person(Entity):
 
     def __str__(self):
         return '{}, {}'.format(self.name_last, self.name_first)
+
+
+class Membership(models.Model):
+    parent = models.ForeignKey('Entity',
+        on_delete=models.CASCADE,
+        related_name='parents'
+    )
+    child = models.ForeignKey('Entity',
+        on_delete=models.CASCADE,
+        related_name='children'
+    )
+
+    roles = (
+        ('DEPARTMENT', 'Department'),
+        ('EMPLOYEE', 'Employee'),
+        ('MEMBER', 'Member'),
+    )
+    role = models.CharField(
+        max_length=50,
+        choices=roles,
+        default='DEPARTMENT',
+    )
+
+    dates = GenericRelation('DateAttr',
+        related_query_name="%(class)s",
+    )
+
 
 #
 # Works
