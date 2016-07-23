@@ -13,7 +13,6 @@ class Base(models.Model):
     class Meta:
         abstract = True
 
-    slug = models.SlugField(max_length=200)
     created = models.DateTimeField('Created', auto_now_add=True)
     modified = models.DateTimeField('Modified', auto_now=True)
 
@@ -33,6 +32,8 @@ class Base(models.Model):
 class Item(Base):
     class Meta:
         abstract = True
+
+    slug = models.SlugField(max_length=200)
 
     # fields for (receiving) generic relations
     dates = GenericRelation('DateAttr',
@@ -65,7 +66,7 @@ class Attribute(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
 
     # fields for citation
-    source = models.ForeignKey('Work', blank=True, null=True)
+    source = models.ForeignKey('Source', blank=True, null=True)
     source_accessed = models.DateField(default=now, blank=True)
 
     def __str__(self):
@@ -87,6 +88,7 @@ class DateAttr(Attribute):
     category = models.CharField(
         max_length=50,
         choices=categories,
+        default="START"
     )
 
     def __str__(self):
@@ -111,6 +113,8 @@ class Entity(Item):
     class Meta:
         abstract = True
 
+    # fields for (receiving) generic relations
+
 
 class Organization(Entity):
     name = models.CharField(max_length=200)
@@ -123,7 +127,7 @@ class Organization(Entity):
     
     related_people = models.ManyToManyField('Person',
         through='OrgPersonRelationship',
-        through_fields=('parent', 'child'),
+        through_fields=('organization', 'person'),
         symmetrical=False,
         related_name='organizations'
     )
@@ -145,8 +149,11 @@ class OrgOrgRelationship(models.Model):
         related_name='children'
     )
     categories = (
-        ('DEPARTMENT', 'Department'),
-        ('MEMBER', 'Member'),
+        ('DEPARTMENT', 'is department of'), 
+        ('LOCATED', 'is located in'), 
+        ('MEMBER', 'is member of'), 
+        ('OWNED', 'is owned by'), 
+        ('PART', 'is part of'), 
     )
     category = models.CharField(
         max_length=50,
@@ -159,21 +166,23 @@ class OrgPersonRelationship(models.Model):
     class Meta:
         verbose_name='member'
 
-    parent = models.ForeignKey('Organization',
+    organization = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
         related_name='organizations'
     )
-    child = models.ForeignKey('Person',
+    person = models.ForeignKey('Person',
         on_delete=models.CASCADE,
         related_name='people'
     )
     categories = (
-        ('EMPLOYEE', 'Employee'),
+        ('EMPLOYED', 'is employed by'), 
+        ('CREATOR', 'is creator of'), 
+        ('MEMBER', 'is member of'), 
     )
     category = models.CharField(
         max_length=50,
         choices=categories,
-        default='EMPLOYEE',
+        default='EMPLOYED',
     )
 
 
@@ -195,22 +204,37 @@ class Person(Entity):
 # Works
 # # #
 
+class Source(Base):
+    content_types = (
+        ('WEBSITE', 'website'),
+        ('BOOK', 'book'),
+    )
+    content_type = models.CharField(choices=content_types, max_length=50)
+
+    book = models.ForeignKey('Book', blank=True)
+    website = models.ForeignKey('Website', blank=True)
+
+    # TODO: needs validation to require at least one foreign key.
+
+    def cast(self):
+        return 'blork'
+
+
 class Work(Item):
+    class Meta:
+        abstract = True
+
     title = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return self.title
 
-    categories = (
-        ('WEBSITE', 'Website'),
-        ('BOOK', 'Book'),
-        ('TOOL', 'Tool'),
-    )
-    category = models.CharField(
-        max_length=50,
-        choices=categories,
-        default='WEBSITE',
-    )
 
-    def __str__(self):
-        return '{}, {}'.format(self.category, self.title)
+class Book(Work):
+    pass
+
+
+class Website(Work):
+    pass
+
+

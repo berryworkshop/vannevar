@@ -6,7 +6,7 @@ from collection.models import (
     Person,
     DateAttr,
     DescriptionAttr,
-    Work,
+    Source,
     )
 
 #
@@ -34,13 +34,13 @@ class OrgChildInline(admin.TabularInline):
     verbose_name='sub-organization'
     model = Organization.related_organizations.through
     extra = 0
-    fk_name = 'child'
+    fk_name = 'parent'
 
 class OrgParentInline(admin.TabularInline):
     verbose_name='super-organization'
     model = Organization.related_organizations.through
     extra = 0
-    fk_name = 'parent'
+    fk_name = 'child'
 
 class OrgChildPersonInline(admin.TabularInline):
     model = Organization.related_people.through
@@ -76,12 +76,6 @@ class PersonAdmin(admin.ModelAdmin):
         PersonParentOrgInline,
     ]
 
-class WorkAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug': ['title']}
-    inlines = [
-        DateAttrInline,
-        DescriptionAttrInline,
-    ]
 
 #
 # Registration
@@ -89,4 +83,4 @@ class WorkAdmin(admin.ModelAdmin):
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Person, PersonAdmin)
-admin.site.register(Work, WorkAdmin)
+admin.site.register(Source)
