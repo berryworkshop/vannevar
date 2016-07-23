@@ -17,7 +17,7 @@ class Base(models.Model):
     modified = models.DateTimeField('Modified', auto_now=True)
 
     def __str__(self):
-        return '{} {}: {}' % (self.__class__.__name__, self.id, self.slug)
+        return '{} {}' % (self.__class__.__name__, self.id)
 
     def to_json(self, include_related=True):
         return {
@@ -42,6 +42,46 @@ class Item(Base):
     descriptions = GenericRelation('DescriptionAttr',
         related_query_name="%(class)s",
         )
+
+    def __str__(self):
+        return '{} {}: {}' % (self.__class__.__name__, self.id, self.slug)
+
+#
+# Miscellaneous
+# # #
+
+class Source(Base):
+    content_types = (
+        ('WEBSITE', 'website'),
+        ('BOOK', 'book'),
+    )
+    content_type = models.CharField(choices=content_types, max_length=50)
+
+    # TODO: refactor to use ContentType framework
+
+    book = models.ForeignKey('Book', blank=True)
+    website = models.ForeignKey('Website', blank=True)
+
+    # TODO: needs validation to require at least one foreign key.
+
+    def cast(self):
+        return 'blork'
+
+
+class License(Item):
+    name = models.CharField(max_length=200)
+    url = models.URLField()
+
+    def __str__(self):
+        return 'name'
+
+
+class Color(Item):
+    name = models.CharField(max_length=200)
+    hue = models.PositiveIntegerField()
+    saturation = models.PositiveIntegerField()
+    lightness = models.PositiveIntegerField()
+    alpha = models.DecimalField(max_digits=3, decimal_places=2 )
 
 
 #
@@ -73,13 +113,35 @@ class Attribute(models.Model):
         return '{} #{}'.format(self.name, self.sequence)
 
 
+class IdentifierAttr(Attribute):
+    class Meta:
+        verbose_name = 'identifier'
+        verbose_name_plural = 'identifiers'
+
+    identifier = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.identifier
+
+
+class AltNameAttr(Attribute):
+    class Meta:
+        verbose_name = 'name'
+        verbose_name_plural = 'names'
+
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
 
 class DateAttr(Attribute):
     class Meta:
         verbose_name = 'date'
         verbose_name_plural = 'dates'
 
-    date = models.DateField(default=now)
+    # TODO: figure out custom date field
+    # date = models.DateField(default=now)
 
     categories = (
         ('START', 'Start'),
@@ -104,6 +166,67 @@ class DescriptionAttr(Attribute):
 
     def __str__(self):
         return self.body[:50]
+
+
+class PlaceAttr(Attribute):
+    class Meta:
+        verbose_name = 'place'
+        verbose_name_plural = 'places'
+
+    latitude = models.DecimalField(max_digits=10, decimal_places=7)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7)
+    altitude = models.DecimalField(max_digits=10, decimal_places=2)
+    radius = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class ImageAttr(Attribute):
+    class Meta:
+        verbose_name = 'image'
+        verbose_name_plural = 'images'
+
+    # TODO after relationship with Wagtail ironed out.
+
+    pass
+
+
+class VersionAttr(Attribute):
+    class Meta:
+        verbose_name = 'version'
+        verbose_name_plural = 'versions'
+
+    # TODO figure out version number field.
+    # version = models.CharField(max_length=200)
+
+    pass
+
+
+class PhoneAttr(Attribute):
+    class Meta:
+        verbose_name = 'phone'
+        verbose_name_plural = 'phones'
+
+    phone = models.CharField(max_length=200)
+
+
+class EmailAttr(Attribute):
+    class Meta:
+        verbose_name = 'email'
+        verbose_name_plural = 'emails'
+
+    email = models.CharField(max_length=200)
+
+
+class AddressAttr(Attribute):
+    class Meta:
+        verbose_name = 'phone'
+        verbose_name_plural = 'phones'
+
+    street = models.TextField()
+    city = models.CharField(max_length=100)
+    state_region = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+
 
 #
 # Entities
@@ -204,21 +327,6 @@ class Person(Entity):
 # Works
 # # #
 
-class Source(Base):
-    content_types = (
-        ('WEBSITE', 'website'),
-        ('BOOK', 'book'),
-    )
-    content_type = models.CharField(choices=content_types, max_length=50)
-
-    book = models.ForeignKey('Book', blank=True)
-    website = models.ForeignKey('Website', blank=True)
-
-    # TODO: needs validation to require at least one foreign key.
-
-    def cast(self):
-        return 'blork'
-
 
 class Work(Item):
     class Meta:
@@ -235,6 +343,14 @@ class Book(Work):
 
 
 class Website(Work):
+    url = models.URLField() # the root URL
+
+
+class Tool(Work):
+    license = models.ForeignKey('License') # the root URL
+
+
+class Photograph(Work):
     pass
 
 

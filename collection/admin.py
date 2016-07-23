@@ -4,6 +4,8 @@ from collection.models import (
     Entity,
     Organization,
     Person,
+    IdentifierAttr,
+    AltNameAttr,
     DateAttr,
     DescriptionAttr,
     Source,
@@ -12,6 +14,22 @@ from collection.models import (
 #
 # Inlines
 # # #
+
+class IdentifierAttrInline(GenericTabularInline):
+    model = IdentifierAttr
+    extra = 0
+    fields = [
+        'identifier', 'source', 'source_accessed',
+    ]
+
+
+class AltNameAttrInline(GenericTabularInline):
+    model = AltNameAttr
+    extra = 0
+    fields = [
+        'name', 'source', 'source_accessed',
+    ]
+
 
 class DateAttrInline(GenericTabularInline):
     verbose_name = 'date'
@@ -60,6 +78,8 @@ class OrganizationAdmin(admin.ModelAdmin):
     fields = ['name', 'slug']
     prepopulated_fields = {'slug': ['name']}
     inlines = [
+        IdentifierAttrInline,
+        AltNameAttrInline,
         DateAttrInline,
         DescriptionAttrInline,
         OrgChildInline,
