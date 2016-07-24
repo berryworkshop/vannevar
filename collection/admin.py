@@ -37,7 +37,7 @@ class DateAttrInline(GenericTabularInline):
     model = DateAttr
     extra = 0
     fields = [
-        'category', 'date', 'source', 'source_accessed',
+        'category', 'source', 'source_accessed',
     ]
 
 
