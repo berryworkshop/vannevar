@@ -43,6 +43,7 @@ class Item(Base):
 
     slug = models.SlugField(max_length=200,
         help_text="Work from the general to the specific, e.g. <em>last-name-first-name</em>.",
+        unique=True,
     )
 
     # fields for (receiving) generic relations
@@ -96,8 +97,15 @@ class License(Item):
     '''
     For software and other custom copyrights.
     '''
-    name = models.CharField(max_length=200)
-    url = models.URLField()
+    name = models.CharField(
+        max_length=200,
+        help_text="Provide a name for this License, e.g. <em>MIT license</em> or <em>Gnu Public License v. 2</em>.",
+        unique=True,
+        )
+    url = models.URLField(
+        help_text="Provide a URL for the source of this License.",
+        unique=True,
+        )
 
     def __str__(self):
         return 'name'
@@ -107,7 +115,11 @@ class Color(Item):
     '''
     A simple class for storing colors.
     '''
-    name = models.CharField(max_length=200)
+    name = models.CharField(
+        max_length=200,
+        help_text="Provide a name for this Color, e.g. <em>scarlet</em> or <em>forest green</em>.",
+        unique=True,
+        )
     h = models.PositiveIntegerField(
         help_text="Select a Hue from 0-255.",
         default=0,
@@ -192,6 +204,7 @@ class IdentifierAttr(Attribute):
     identifier = models.CharField(
         max_length=200,
         help_text="An identifier from the original context, like a DOI, LoC, or museum accession number.",
+        unique=True,
         )
 
     def __str__(self):
@@ -209,6 +222,7 @@ class AltNameAttr(Attribute):
     name = models.CharField(
         max_length=200,
         help_text="What other names was the item known by?",
+        unique=True,
         )
 
     def __str__(self):
@@ -289,6 +303,8 @@ class PlaceAttr(Attribute):
         blank=True,
         )
 
+    # TODO: validate uniqueness
+
 
 class ImageAttr(Attribute):
     '''
@@ -332,7 +348,12 @@ class PhoneAttr(Attribute):
         default="PRIMARY",
         )
 
-    phone = models.CharField(max_length=200)
+    phone = models.CharField(
+        max_length=200,
+        help_text="Provide a phone number, e.g. <pre>(312) 987-6543</pre>",
+        unique=True,
+        )
+    # TODO validate phone number format
 
 
 class EmailAttr(Attribute):
@@ -350,7 +371,11 @@ class EmailAttr(Attribute):
         default="PRIMARY",
         )
 
-    email = models.CharField(max_length=200)
+    email = models.CharField(
+        max_length=200,
+        help_text = "Provide an email address, e.g. <pre>allan@example.com</pre>.",
+        unique=True,
+        )
 
 
 class AddressAttr(Attribute):
@@ -388,6 +413,8 @@ class AddressAttr(Attribute):
         default='USA'
         )
 
+    # TODO validate uniqueness somehow?
+
 
 #
 # Entities
@@ -409,7 +436,11 @@ class Organization(Entity):
     '''
     Companies, Communities, Nonprofits, Consortia.
     '''
-    name = models.CharField(max_length=200)
+    name = models.CharField(
+        max_length=200,
+        help_text="Provide the canonical name for this Organization.",
+        unique=True,
+        )
 
     related_organizations = models.ManyToManyField('Organization',
         through='OrgOrgRelationship',
@@ -461,6 +492,8 @@ class OrgOrgRelationship(models.Model):
         help_text="Select a qualifier for this relationship.",
     )
 
+    # TODO: validate combination of parent and child?
+
 
 class OrgPersonRelationship(models.Model):
     '''
@@ -491,6 +524,8 @@ class OrgPersonRelationship(models.Model):
         help_text="Select a qualifier for this relationship.",
     )
 
+    # TODO: validate combination of org and person?
+
 
 class Person(Entity):
     '''
@@ -507,6 +542,8 @@ class Person(Entity):
         max_length=200,
         blank=True,
         help_text="Provide other names here, including given and middle names.",)
+
+        # TODO validate uniqueness of Name Last and Name First
 
     def __str__(self):
         return '{}, {}'.format(self.name_last, self.name_first)
@@ -530,6 +567,7 @@ class Work(Item):
     title = models.CharField(
         max_length=200,
         help_text="Provide a title.",
+        unique=True,
         )
 
     def __str__(self):
@@ -548,7 +586,8 @@ class Website(Work):
     Software or documents accessible via the Web.
     '''
     url = models.URLField(
-        help_text="Provide the root URL for this Website, in the form <pre>http://example.com/</pre>."
+        help_text="Provide the root URL for this Website, in the form <pre>http://example.com/</pre>.",
+        unique=True,
         )
 
 
