@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
+from .controlled_vocabularies import contact_categories, iso_3166_1_alpha_3
 
 
 #
@@ -315,15 +316,6 @@ class VersionAttr(Attribute):
 
     pass
 
-# contact_types provide shared categories for phone, email,
-# and addresse attributes
-contact_categories = (
-    ('PRIMARY', 'primary'),
-    ('SECONDARY', 'secondary'),
-    ('WORK', 'work'),
-    ('HOME', 'home'),
-    ('INFODESK', 'main information desk'),
-)
 
 class PhoneAttr(Attribute):
     '''
@@ -372,15 +364,29 @@ class AddressAttr(Attribute):
     category = models.CharField(
         max_length=50,
         choices=contact_categories,
-        help_text="What type of address is this?",
+        help_text="What type of postal address is this?",
         default="PRIMARY",
         )
 
-    street = models.TextField()
-    city = models.CharField(max_length=100)
-    state_region = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
+    street = models.TextField(
+        help_text="Provide a street address.  For a new line, press <pre>shift-enter</pre> (<pre>shift-return</pre> on a Mac).",
+        )
+    city = models.CharField(
+        max_length=100,
+        help_text="Provide a city or community name.",
+        )
+    state_region = models.CharField(max_length=100,
+        help_text="Provide a state, province, or other region for postal purposes.",
+        )
+    postal_code = models.CharField(max_length=100,
+        help_text="Provide a zip or other postal code.",
+        )
+    country = models.CharField(
+        max_length=3,
+        help_text="Select a nation or country.",
+        choices=iso_3166_1_alpha_3,
+        default='USA'
+        )
 
 
 #
@@ -408,14 +414,16 @@ class Organization(Entity):
     related_organizations = models.ManyToManyField('Organization',
         through='OrgOrgRelationship',
         through_fields=('parent', 'child'),
-        symmetrical=False
+        symmetrical=False,
+        help_text="Select or create a related Organization.",
     )
     
     related_people = models.ManyToManyField('Person',
         through='OrgPersonRelationship',
         through_fields=('organization', 'person'),
         symmetrical=False,
-        related_name='organizations'
+        related_name='organizations',
+        help_text="Select or create a related (member) Person.",
     )
 
     def __str__(self):
@@ -431,11 +439,13 @@ class OrgOrgRelationship(models.Model):
 
     parent = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
-        related_name='parents'
+        related_name='parents',
+        help_text="Select a parent Organization.",
     )
     child = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
-        related_name='children'
+        related_name='children',
+        help_text="Select a child Organization.",
     )
     categories = (
         ('DEPARTMENT', 'is department of'), 
@@ -447,7 +457,8 @@ class OrgOrgRelationship(models.Model):
     category = models.CharField(
         max_length=50,
         choices=categories,
-        default='DEPARTMENT',
+        default='DEPARTMENT',   
+        help_text="Select a qualifier for this relationship.",
     )
 
 
@@ -460,11 +471,13 @@ class OrgPersonRelationship(models.Model):
 
     organization = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
-        related_name='organizations'
+        related_name='organizations',
+        help_text="Select a parent Organization.",
     )
     person = models.ForeignKey('Person',
         on_delete=models.CASCADE,
-        related_name='people'
+        related_name='people',
+        help_text="Select a Person who is part of this Organization.",
     )
     categories = (
         ('EMPLOYED', 'is employed by'), 
@@ -475,6 +488,7 @@ class OrgPersonRelationship(models.Model):
         max_length=50,
         choices=categories,
         default='EMPLOYED',
+        help_text="Select a qualifier for this relationship.",
     )
 
 
@@ -485,8 +499,14 @@ class Person(Entity):
     class Meta:
         verbose_name_plural = 'people'
 
-    name_last  = models.CharField(max_length=200)
-    name_first = models.CharField(max_length=200, blank=True)
+    name_last  = models.CharField(
+        max_length=200,
+        help_text="Provide a surname.",
+        )
+    name_first = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Provide other names here, including given and middle names.",)
 
     def __str__(self):
         return '{}, {}'.format(self.name_last, self.name_first)
@@ -507,7 +527,10 @@ class Work(Item):
     class Meta:
         abstract = True
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(
+        max_length=200,
+        help_text="Provide a title.",
+        )
 
     def __str__(self):
         return self.title
@@ -524,14 +547,18 @@ class Website(Work):
     '''
     Software or documents accessible via the Web.
     '''
-    url = models.URLField() # the root URL
+    url = models.URLField(
+        help_text="Provide the root URL for this Website, in the form <pre>http://example.com/</pre>."
+        )
 
 
 class Tool(Work):
     '''
-    Digital(?) projects used by LAMs.
+    Software used by LAMs.
     '''
-    license = models.ForeignKey('License') # the root URL
+    license = models.ForeignKey('License',
+        help_text="Select a license for this software tool.",
+    )
 
 
 class Photograph(Work):
