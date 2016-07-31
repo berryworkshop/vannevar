@@ -166,13 +166,9 @@ class Attribute(models.Model):
     # fields for generic relations
     content_type = models.ForeignKey(ContentType,
         on_delete = models.CASCADE,
-        default = ContentType.objects.get(
-            app_label="collection", model="organization").pk,
         help_text="Provide the model name for the generic relation.",
         )
     object_id = models.PositiveIntegerField(
-        blank=True,
-        null=True,
         help_text="Provide the actual object ID of the generic relation within the table of the Content Type.",
         )
     content_object = GenericForeignKey('content_type', 'object_id')
