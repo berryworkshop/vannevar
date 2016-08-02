@@ -183,7 +183,10 @@ class Organization(Item):
         default=True,
         help_text="Select whether or not this organization is organized as a not-for-profit entity.")
 
-    categories = models.ManyToManyField('OrganizationCategory')
+    categories = models.ManyToManyField(
+        'OrganizationCategory',
+        blank=True,
+        )
     tags = TaggableManager()
 
     related_organizations = models.ManyToManyField('Organization',
@@ -191,6 +194,7 @@ class Organization(Item):
         through_fields=('parent', 'child'),
         symmetrical=False,
         help_text="Select or create a related Organization.",
+        blank=True,
         )
 
     def __str__(self):

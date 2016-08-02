@@ -58,7 +58,6 @@ class OrganizationAdmin(admin.ModelAdmin):
     '''
     Admin for Organization entry.
     '''
-    fields = ['name', 'categories', 'tags', 'website', 'address', 'nonprofit', 'slug']
     list_display = ['name', 'categories_', 'tags_']
     prepopulated_fields = {'slug': ['name']}
     inlines = [

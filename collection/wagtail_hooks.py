@@ -11,6 +11,8 @@ class OrganizationAdmin(ModelAdmin):
     menu_order = 200
     add_to_settings_menu = False
     list_display = ('name', 'slug', )
+    # fields = ['name', 'categories', 'tags', 'website', 'address', 'nonprofit', 'slug']
+
     # prepopulated_fields = {'slug': ['name']} # TODO: does not work yet
     search_fields = ('name',)
     # inlines = [
