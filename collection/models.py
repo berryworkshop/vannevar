@@ -74,6 +74,34 @@ class Attribute(Base):
     content_object = GenericForeignKey('content_type', 'object_id')
 
 
+class AltNameAttr(Attribute):
+   '''
+   For tracking alternative names for organizations, like abbreviations.
+   '''
+   class Meta:
+       verbose_name = 'alternate name'
+       verbose_name_plural = 'alternate names'
+
+   name = models.CharField(
+        max_length = 200,
+        help_text="Select an alternate Name, e.g. the abbreviation 'OCLC'.",
+        )
+
+   categories = (
+       ('ABBREVIATION', 'abbreviation'),
+       ('NICKNAME', 'nickname'),
+   )
+   category = models.CharField(
+       max_length=50,
+       choices=categories,
+       default="ABBREVIATION",
+       help_text="In what category is this name?",
+   )
+
+   def __str__(self):
+       return self.get_category_display()
+
+
 class EventAttr(Attribute):
    '''
    For tracking events like birth dates and death dates.
@@ -92,7 +120,6 @@ class EventAttr(Attribute):
        ('INCORPORATION', 'incorporation'),
        ('TERMINATION', 'termination'),
    )
-
    category = models.CharField(
        max_length=50,
        choices=categories,
@@ -121,12 +148,12 @@ class OrganizationCategory(Base):
         ('SCHOOL', 'school'),
     )
     category = models.CharField(
-       max_length=50,
-       choices=categories,
-       default="LIBRARY",
-       help_text="What type of organization?",
-       unique=True
-   )
+        max_length=50,
+        choices=categories,
+        default="LIBRARY",
+        help_text="What type of organization?",
+        unique=True
+        )
 
     def __str__(self):
         return self.get_category_display()
