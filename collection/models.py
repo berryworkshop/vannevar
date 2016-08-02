@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKe
 from django.core.validators import MaxValueValidator
 
 from .controlled_vocabularies import contact_categories, iso_3166_1_alpha_3
-
+from taggit.managers import TaggableManager
 
 #
 # Main
@@ -20,9 +20,6 @@ class Base(models.Model):
 
     created = models.DateTimeField('Created', auto_now_add=True)
     modified = models.DateTimeField('Modified', auto_now=True)
-
-    def __str__(self):
-        return '{} {}' % (self.__class__.__name__, self.id)
 
     def to_json(self, include_related=True):
         return {
@@ -104,11 +101,35 @@ class EventAttr(Attribute):
    )
 
    def __str__(self):
-       return str(self.date)
+       return str(self.year)
 
 #
 # Entities
 # # #
+
+
+class OrganizationCategory(Base):
+    '''
+    A controlled vocabulary for Organization categories.
+    '''
+    categories = (
+        ('ARCHIVE', 'archive'),
+        ('CONSORTIUM', 'consortium'),
+        ('CORPORATION', 'corporation'),
+        ('LIBRARY', 'library'),
+        ('MUSEUM', 'museum'),
+        ('SCHOOL', 'school'),
+    )
+    category = models.CharField(
+       max_length=50,
+       choices=categories,
+       default="LIBRARY",
+       help_text="What type of organization?",
+       unique=True
+   )
+
+    def __str__(self):
+        return self.get_category_display()
 
 
 class Organization(Item):
@@ -130,6 +151,13 @@ class Organization(Item):
         unique=True,
         blank=True,
         )
+
+    nonprofit = models.BooleanField(
+        default=True,
+        help_text="Select whether or not this organization is organized as a not-for-profit entity.")
+
+    categories = models.ManyToManyField('OrganizationCategory')
+    tags = TaggableManager()
 
     related_organizations = models.ManyToManyField('Organization',
         through='OrgOrgRelationship',

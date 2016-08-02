@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.db import models
-from django.forms import Textarea
+from django.forms import Textarea, CheckboxSelectMultiple
 from django.contrib.contenttypes.admin import GenericTabularInline
 from collection.models import (
+    OrganizationCategory,
     Organization,
     EventAttr,
     )
@@ -18,7 +19,7 @@ class EventAttrInline(GenericTabularInline):
     extra = 0
 
 class OrgChildInline(admin.TabularInline):
-    verbose_name='sub-organization'
+    verbose_name='sub-organization' 
     model = Organization.related_organizations.through
     extra = 0
     fk_name = 'parent'
@@ -35,7 +36,7 @@ class OrgParentInline(admin.TabularInline):
 
 
 class OrganizationAdmin(admin.ModelAdmin):
-    fields = ['name', 'website', 'address', 'slug']
+    fields = ['name', 'categories', 'tags', 'website', 'address', 'nonprofit', 'slug']
     prepopulated_fields = {'slug': ['name']}
     inlines = [
         EventAttrInline,
@@ -48,10 +49,12 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'rows': 1,
                 'cols': 40,
                 'style': 'height: 3em;'})},
+        models.ManyToManyField: {
+            'widget': CheckboxSelectMultiple},
+
     }
 
 #
 # Registration
 # # #
-
 admin.site.register(Organization, OrganizationAdmin)
