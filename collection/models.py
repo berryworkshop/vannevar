@@ -11,7 +11,6 @@ from .controlled_vocabularies import contact_categories, iso_3166_1_alpha_3
 # Main
 # # #
 
-
 class Base(models.Model):
     '''
     The most rudimentary stuff, for use in every custom model.
@@ -79,34 +78,33 @@ class Attribute(Base):
 
 
 class EventAttr(Attribute):
-    '''
-    For tracking events like birth dates and death dates.
-    '''
-    class Meta:
-        verbose_name = 'event'
-        verbose_name_plural = 'events'
+   '''
+   For tracking events like birth dates and death dates.
+   '''
+   class Meta:
+       verbose_name = 'event'
+       verbose_name_plural = 'events'
 
-    # TODO: figure out custom date field
-    year = models.PositiveIntegerField(
-        help_text="During what year did the event happen?",
-        validators=[MaxValueValidator(9999)]
-        )
+   # TODO: figure out custom date field
+   year = models.PositiveIntegerField(
+       help_text="During what year did the event happen?",
+       validators=[MaxValueValidator(9999)]
+       )
 
-    categories = (
-        ('INCORPORATION', 'incorporation'),
-        ('TERMINATION', 'termination'),
-    )
+   categories = (
+       ('INCORPORATION', 'incorporation'),
+       ('TERMINATION', 'termination'),
+   )
 
-    category = models.CharField(
-        max_length=50,
-        choices=categories,
-        default="INCORPORATION",
-        help_text="What is this event?",
-    )
+   category = models.CharField(
+       max_length=50,
+       choices=categories,
+       default="INCORPORATION",
+       help_text="What is this event?",
+   )
 
-    def __str__(self):
-        return str(self.date)
-
+   def __str__(self):
+       return str(self.date)
 
 #
 # Entities
