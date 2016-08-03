@@ -58,6 +58,10 @@ class OrganizationAdmin(admin.ModelAdmin):
     '''
     Admin for Organization entry.
     '''
+
+    # allows reordering/exclusion of fields
+    fields = ['name', 'categories', 'tags', 'website', 'address', 'nonprofit', 'slug']
+    
     list_display = ['name', 'categories_', 'tags_']
     prepopulated_fields = {'slug': ['name']}
     inlines = [
