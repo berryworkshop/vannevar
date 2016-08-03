@@ -21,15 +21,6 @@ class Base(models.Model):
     created = models.DateTimeField('Created', auto_now_add=True)
     modified = models.DateTimeField('Modified', auto_now=True)
 
-    def to_json(self, include_related=True):
-        return {
-            'id': self.id,
-            'slug': self.slug,
-            'created': self.created.isoformat(),
-            'modified': self.modified.isoformat(),
-            'class_name': self.__class__.__name__,
-        }
-
 
 class Item(Base):
     '''
@@ -47,6 +38,15 @@ class Item(Base):
     events = GenericRelation('EventAttr',
         related_query_name="%(class)s",
         )
+
+    def to_json(self, include_related=True):
+        return {
+            'id': self.id,
+            'slug': self.slug,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
+            'class_name': self.__class__.__name__,
+        }
 
     def __str__(self):
         return '{} {}: {}' % (self.__class__.__name__, self.id, self.slug)
