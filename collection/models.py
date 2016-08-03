@@ -18,8 +18,12 @@ class Base(models.Model):
     class Meta:
         abstract = True
 
-    created = models.DateTimeField('Created', auto_now_add=True)
-    modified = models.DateTimeField('Modified', auto_now=True)
+    created = models.DateTimeField('Created',
+        auto_now_add=True,
+        )
+    modified = models.DateTimeField('Modified',
+        auto_now=True,
+        )
 
 
 class Item(Base):
@@ -32,7 +36,7 @@ class Item(Base):
     slug = models.SlugField(max_length=200,
         help_text="Work from the general to the specific, e.g. <em>last-name-first-name</em>.",
         unique=True,
-    )
+        )
 
     # fields for (receiving) generic relations
     events = GenericRelation('EventAttr',
@@ -90,13 +94,13 @@ class AltNameAttr(Attribute):
    categories = (
        ('ABBREVIATION', 'abbreviation'),
        ('NICKNAME', 'nickname'),
-   )
+       )
    category = models.CharField(
        max_length=50,
        choices=categories,
        default="ABBREVIATION",
        help_text="In what category is this name?",
-   )
+       )
 
    def __str__(self):
        return self.get_category_display()
@@ -119,13 +123,13 @@ class EventAttr(Attribute):
    categories = (
        ('INCORPORATION', 'incorporation'),
        ('TERMINATION', 'termination'),
-   )
+       )
    category = models.CharField(
        max_length=50,
        choices=categories,
        default="INCORPORATION",
        help_text="What is this event?",
-   )
+       )
 
    def __str__(self):
        return str(self.year)
@@ -146,7 +150,7 @@ class OrganizationCategory(Base):
         ('LIBRARY', 'library'),
         ('MUSEUM', 'museum'),
         ('SCHOOL', 'school'),
-    )
+        )
     category = models.CharField(
         max_length=50,
         choices=categories,
@@ -172,17 +176,18 @@ class Organization(Item):
         help_text="Provide the canonical website URL for this Organization.",
         unique=True,
         blank=True,
+        null=True,
         )
     address = models.TextField(    
         help_text="Provide the canonical physical address for this Organization.",
         unique=True,
         blank=True,
+        null=True,
         )
-
     nonprofit = models.BooleanField(
         default=True,
-        help_text="Select whether or not this organization is organized as a not-for-profit entity.")
-
+        help_text="Select whether or not this organization is organized as a not-for-profit entity."
+        )
     categories = models.ManyToManyField(
         'OrganizationCategory',
         blank=True,
@@ -190,7 +195,6 @@ class Organization(Item):
     tags = TaggableManager(
         blank=True
         )
-
     related_organizations = models.ManyToManyField('Organization',
         through='OrgOrgRelationship',
         through_fields=('parent', 'child'),
@@ -214,24 +218,24 @@ class OrgOrgRelationship(models.Model):
         on_delete=models.CASCADE,
         related_name='parents',
         help_text="Select a parent Organization.",
-    )
+        )
     child = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
         related_name='children',
         help_text="Select a child Organization.",
-    )
+        )
     categories = (
         ('DEPARTMENT', 'is department of'), 
         ('LOCATED', 'is located in'), 
         ('MEMBER', 'is member of'), 
         ('OWNED', 'is owned by'), 
         ('PART', 'is part of'), 
-    )
+        )
     category = models.CharField(
         max_length=50,
         choices=categories,
         default='DEPARTMENT',   
         help_text="Select a qualifier for this relationship.",
-    )
+        )
 
     # TODO: validate combination of parent and child?

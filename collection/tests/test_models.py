@@ -1,10 +1,12 @@
 from django.test import TestCase
 from collection.models import Organization
+from model_mommy import mommy
 
 
 class OrganizationTestCase(TestCase):
     def setUp(self):
-        Organization.objects.create(name="Test Org")
+        mommy.make(Organization, name='Test Org')
+
 
     def test_org_str(self):
         '''
