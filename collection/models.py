@@ -187,7 +187,9 @@ class Organization(Item):
         'OrganizationCategory',
         blank=True,
         )
-    tags = TaggableManager()
+    tags = TaggableManager(
+        blank=True
+        )
 
     related_organizations = models.ManyToManyField('Organization',
         through='OrgOrgRelationship',

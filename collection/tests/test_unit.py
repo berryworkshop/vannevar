@@ -1,5 +1,6 @@
 from django.test import TestCase
-from .models import Organization
+from collection.models import Organization
+
 
 class OrganizationTestCase(TestCase):
     def setUp(self):
