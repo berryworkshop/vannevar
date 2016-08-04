@@ -60,9 +60,9 @@ class OrganizationAdmin(admin.ModelAdmin):
     '''
 
     # allows reordering/exclusion of fields
-    fields = ['name', 'categories', 'tags', 'website', 'address', 'nonprofit', 'slug']
+    fields = ['name', 'slug', 'categories', 'tags', 'website', 'address', 'scope', 'nonprofit']
     
-    list_display = ['name', 'categories_', 'tags_']
+    list_display = ['name', 'scope', 'categories_', 'tags_']
     prepopulated_fields = {'slug': ['name']}
     inlines = [
         EventAttrInline,

@@ -34,7 +34,7 @@ class Item(Base):
         abstract = True
 
     slug = models.SlugField(max_length=200,
-        help_text="Work from the general to the specific, e.g. <em>last-name-first-name</em>.",
+        help_text="Work from the general to the specific, e.g. <em>last-name-first-name</em>.  If this is a generic name, affix with a parent acronym, e.g. <em>aic-prints-drawings</em>.",
         unique=True,
         )
 
@@ -90,13 +90,13 @@ class AltNameAttr(Attribute):
          max_length = 200,
          help_text="Select an alternate Name, e.g. the abbreviation 'OCLC'.",
          )
-    categories = (
+    CATEGORIES = (
             ('ABBREVIATION', 'abbreviation'),
             ('NICKNAME', 'nickname'),
         )
     category = models.CharField(
         max_length=50,
-        choices=categories,
+        choices=CATEGORIES,
         default="ABBREVIATION",
         help_text="In what category is this name?",
         )
@@ -116,7 +116,7 @@ class AltNameAttr(Attribute):
 #    description = models.TextField(
 #        help_text="Describe the organization in narrative form.",
 #        )
-#    categories = (
+#    CATEGORIES = (
 #        ('MISSION', 'an official mission statement'),
 #        ('HISTORY', 'an historical narrative'),
 #        ('FORM', 'appearance, situation or physical context'),
@@ -124,7 +124,7 @@ class AltNameAttr(Attribute):
 #        )
 #    category = models.CharField(
 #        max_length=50,
-#        choices=categories,
+#        choices=CATEGORIES,
 #        default="MISSION",
 #        help_text="What sort of descriptive information is this?",
 #        )
@@ -146,13 +146,13 @@ class EventAttr(Attribute):
        help_text="During what year did the event happen?",
        validators=[MaxValueValidator(9999)]
        )
-   categories = (
+   CATEGORIES = (
        ('INCORPORATION', 'incorporation'),
        ('TERMINATION', 'termination'),
        )
    category = models.CharField(
        max_length=50,
-       choices=categories,
+       choices=CATEGORIES,
        default="INCORPORATION",
        help_text="What is this event?",
        )
@@ -169,17 +169,21 @@ class OrganizationCategory(Base):
     '''
     A controlled vocabulary for Organization categories.
     '''
-    categories = (
+    CATEGORIES = (
         ('ARCHIVE', 'archive'),
+        ('ASSOCIATION', 'center'),
         ('CONSORTIUM', 'consortium'),
         ('CORPORATION', 'corporation'),
+        ('FOUNDATION', 'foundation'),
+        ('GALLERY', 'gallery'),
         ('LIBRARY', 'library'),
         ('MUSEUM', 'museum'),
         ('SCHOOL', 'school'),
         )
+
     category = models.CharField(
         max_length=50,
-        choices=categories,
+        choices=CATEGORIES,
         default="LIBRARY",
         help_text="What type of organization?",
         unique=True
@@ -198,17 +202,18 @@ class Organization(Item):
         help_text="Provide the canonical name for this Organization.",
         unique=True,
         )
+    intro = models.CharField(
+        max_length=250,
+        help_text="Provide a short, precise, summary of this Organization.",
+        blank=True,
+        )
     website = models.URLField(
         help_text="Provide the canonical website URL for this Organization.",
-        unique=True,
         blank=True,
-        null=True,
         )
     address = models.TextField(
         help_text="Provide the canonical physical address for this Organization.",
-        unique=True,
         blank=True,
-        null=True,
         )
     nonprofit = models.BooleanField(
         default=True,
@@ -217,22 +222,22 @@ class Organization(Item):
 
     # scopes
     # hat tip http://www.b-list.org/weblog/2007/nov/02/handle-choices-right-way/
-    SCOPE_CLOSED = 0
-    SCOPE_LOCAL = 1
-    SCOPE_REGIONAL = 2
-    SCOPE_NATIONAL = 3
-    SCOPE_INTERNATIONAL = 4
+    INACTIVE_SCOPE = 0
+    MINOR_SCOPE = 1
+    MODERATE_SCOPE = 2
+    MAJOR_SCOPE = 3
+    SUPER_SCOPE = 4
     SCOPES = (
-        (SCOPE_CLOSED, 'closed'),
-        (SCOPE_LOCAL, 'local'),
-        (SCOPE_REGIONAL, 'regional'),
-        (SCOPE_NATIONAL, 'national'),
-        (SCOPE_INTERNATIONAL, 'international'),
+        (INACTIVE_SCOPE, 'closed'),
+        (MINOR_SCOPE, 'local'),
+        (MODERATE_SCOPE, 'regional'),
+        (MAJOR_SCOPE, 'national'),
+        (SUPER_SCOPE, 'international'),
         )
     scope = models.IntegerField(
-        help_text="What is the level of influence, reach, or exposure of this Organization?",
+        help_text="What is the level of influence, reach, or exposure of this Organization within its industry?  This is a subjective rubric intended to imply scale or importance: an individual gallery, a supermarket, or a high school would be 'local'; a holding company, a city arts center, or a college would be 'regional'; most large corporations, museums, or state universities would be 'national'.  Only the largest, most famous entities, e.g. Microsoft, the Louvre, the New York Philharmonic, or Harvard University, are considered 'international'.",
         choices=SCOPES,
-        default=SCOPE_LOCAL,
+        default=MODERATE_SCOPE,
         )
 
     categories = models.ManyToManyField(
@@ -271,7 +276,7 @@ class OrgOrgRelationship(models.Model):
         related_name='children',
         help_text="Select a child Organization.",
         )
-    categories = (
+    CATEGORIES = (
         ('DEPARTMENT', 'is department of'), 
         ('LOCATED', 'is located in'), 
         ('MEMBER', 'is member of'), 
@@ -280,7 +285,7 @@ class OrgOrgRelationship(models.Model):
         )
     category = models.CharField(
         max_length=50,
-        choices=categories,
+        choices=CATEGORIES,
         default='DEPARTMENT',   
         help_text="Select a qualifier for this relationship.",
         )

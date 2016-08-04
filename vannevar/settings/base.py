@@ -24,7 +24,6 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # Application definition
 
 INSTALLED_APPS = [
-    'home',
     'search',
 
     'wagtail.wagtailforms',
@@ -52,7 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
-    'blog',
+    'cms',
     'collection',
 ]
 

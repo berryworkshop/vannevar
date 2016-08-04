@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 from modelcluster.fields import ParentalKey
 
@@ -11,18 +12,38 @@ from wagtail.wagtailsearch import index
 from vannevar.models import RelatedLink
 
 
-class BlogPage(Page):
+class HomePage(Page):
+    pass
+
+
+class ArticleIndexPage(Page):
+    pass
+
+
+class ArticlePage(Page):
+    '''
+    Generic article for website content.
+    '''
     main_image = models.ForeignKey(
         'wagtailimages.Image',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
     )
 
-    date = models.DateField("Post date")
-    intro = models.CharField(max_length=250)
-    body = RichTextField(blank=True)
+    date = models.DateField(
+        "Post date",
+        default=now,
+        )
+    intro = models.TextField(
+        max_length=250,
+        help_text="Provide a short, precise, summary of this Article.",
+        blank=True,
+        )
+    body = RichTextField(
+        blank=True
+        )
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
@@ -34,16 +55,4 @@ class BlogPage(Page):
         ImageChooserPanel('main_image'),
         FieldPanel('intro'),
         FieldPanel('body', classname="full")
-    ]
-
-
-class BlogIndexRelatedLink(Orderable, RelatedLink):
-    page = ParentalKey('BlogIndexPage', related_name='related_links')
-
-class BlogIndexPage(Page):
-    intro = RichTextField(blank=True)
-
-    content_panels = Page.content_panels + [
-        FieldPanel('intro', classname="full"),
-        InlinePanel('related_links', label="Related links"),
     ]
