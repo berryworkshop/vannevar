@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea, CheckboxSelectMultiple
 from django.contrib.contenttypes.admin import GenericTabularInline
-from collection.models import (
+from catalog.models import (
     OrganizationCategory,
     Organization,
     AltNameAttr,

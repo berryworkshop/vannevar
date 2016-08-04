@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.test import Client
-from collection.models import Organization
+from catalog.models import Organization
 from model_mommy import mommy
 
 
@@ -19,7 +19,7 @@ class HomeTest(TestCase):
         self.assertEqual(self.response.status_code, 200)
 
 
-class CollectionOrganizationsTest(TestCase):
+class CatalogOrganizationsTest(TestCase):
 
     def setUp(self):
         '''
@@ -46,7 +46,7 @@ class CollectionOrganizationsTest(TestCase):
         '''
         Response should use the correct template.
         '''
-        self.assertTemplateUsed(self.response, 'collection/organizations.html')
+        self.assertTemplateUsed(self.response, 'catalog/organizations.html')
 
     def test_organizations_headline(self):
         '''

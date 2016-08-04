@@ -1,5 +1,5 @@
 from django.test import TestCase
-from collection.models import Organization
+from catalog.models import Organization
 from model_mommy import mommy
 
 
