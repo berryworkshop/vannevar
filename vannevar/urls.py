@@ -18,11 +18,12 @@ urlpatterns = [
     url(r'^admin/', include(wagtailadmin_urls)),
     url(r'^documents/', include(wagtaildocs_urls)),
 
-    url(r'^collection/', include(collection_urls)),
-
     url(r'^search/$', search_views.search, name='search'),
 
-    url(r'', include(wagtail_urls)),
+    url(r'^pages/', include(wagtail_urls)),
+
+    url(r'', include(collection_urls)),
+    
 ]
 
 

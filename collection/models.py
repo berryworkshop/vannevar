@@ -79,31 +79,58 @@ class Attribute(Base):
 
 
 class AltNameAttr(Attribute):
-   '''
-   For tracking alternative names for organizations, like abbreviations.
-   '''
-   class Meta:
-       verbose_name = 'alternate name'
-       verbose_name_plural = 'alternate names'
-
-   name = models.CharField(
-        max_length = 200,
-        help_text="Select an alternate Name, e.g. the abbreviation 'OCLC'.",
+    '''
+    For tracking alternative names for organizations, like abbreviations.
+    '''
+    class Meta:
+        verbose_name = 'alternate name'
+        verbose_name_plural = 'alternate names'
+ 
+    name = models.CharField(
+         max_length = 200,
+         help_text="Select an alternate Name, e.g. the abbreviation 'OCLC'.",
+         )
+    categories = (
+            ('ABBREVIATION', 'abbreviation'),
+            ('NICKNAME', 'nickname'),
         )
+    category = models.CharField(
+        max_length=50,
+        choices=categories,
+        default="ABBREVIATION",
+        help_text="In what category is this name?",
+        )
+ 
+    def __str__(self):
+        return self.get_category_display()
 
-   categories = (
-       ('ABBREVIATION', 'abbreviation'),
-       ('NICKNAME', 'nickname'),
-       )
-   category = models.CharField(
-       max_length=50,
-       choices=categories,
-       default="ABBREVIATION",
-       help_text="In what category is this name?",
-       )
 
-   def __str__(self):
-       return self.get_category_display()
+#class DescriptionAttr(Attribute):
+#    '''
+#    For tracking descriptive elements.
+#    '''
+#    class Meta:
+#        verbose_name = 'description'
+#        verbose_name_plural = 'descriptions'
+# 
+#    description = models.TextField(
+#        help_text="Describe the organization in narrative form.",
+#        )
+#    categories = (
+#        ('MISSION', 'an official mission statement'),
+#        ('HISTORY', 'an historical narrative'),
+#        ('FORM', 'appearance, situation or physical context'),
+#        ('FUNCTION', 'operational documentation'),
+#        )
+#    category = models.CharField(
+#        max_length=50,
+#        choices=categories,
+#        default="MISSION",
+#        help_text="What sort of descriptive information is this?",
+#        )
+# 
+#    def __str__(self):
+#        return str(self.description)
 
 
 class EventAttr(Attribute):
@@ -119,7 +146,6 @@ class EventAttr(Attribute):
        help_text="During what year did the event happen?",
        validators=[MaxValueValidator(9999)]
        )
-
    categories = (
        ('INCORPORATION', 'incorporation'),
        ('TERMINATION', 'termination'),
@@ -178,7 +204,7 @@ class Organization(Item):
         blank=True,
         null=True,
         )
-    address = models.TextField(    
+    address = models.TextField(
         help_text="Provide the canonical physical address for this Organization.",
         unique=True,
         blank=True,
@@ -188,6 +214,27 @@ class Organization(Item):
         default=True,
         help_text="Select whether or not this organization is organized as a not-for-profit entity."
         )
+
+    # scopes
+    # hat tip http://www.b-list.org/weblog/2007/nov/02/handle-choices-right-way/
+    SCOPE_CLOSED = 0
+    SCOPE_LOCAL = 1
+    SCOPE_REGIONAL = 2
+    SCOPE_NATIONAL = 3
+    SCOPE_INTERNATIONAL = 4
+    SCOPES = (
+        (SCOPE_CLOSED, 'closed'),
+        (SCOPE_LOCAL, 'local'),
+        (SCOPE_REGIONAL, 'regional'),
+        (SCOPE_NATIONAL, 'national'),
+        (SCOPE_INTERNATIONAL, 'international'),
+        )
+    scope = models.IntegerField(
+        help_text="What is the level of influence, reach, or exposure of this Organization?",
+        choices=SCOPES,
+        default=SCOPE_LOCAL,
+        )
+
     categories = models.ManyToManyField(
         'OrganizationCategory',
         blank=True,
