@@ -3,11 +3,13 @@ from django.conf import settings
 from django.contrib import admin
 
 from catalog import urls as catalog_urls
+from cms import urls as cms_urls
 
 
 urlpatterns = [
     url(r'^django-admin/', include(admin.site.urls)),
     url(r'^catalog/', include(catalog_urls)),
+    url(r'^', include(cms_urls)),
 ]
 
 

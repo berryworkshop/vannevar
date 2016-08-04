@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
     'django_extensions',
     'catalog',
+    'cms',
 ]
 
 # just a test.
