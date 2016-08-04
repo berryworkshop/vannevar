@@ -8,5 +8,12 @@
 </head>
 <body>
     <h1>List of Organizations.</h1>
+
+    <ul>
+    {% for org in view.organizations %}
+        <li>{{ org }}</li>
+    {% endfor %}
+    </ul>
+    
 </body>
 </html>
