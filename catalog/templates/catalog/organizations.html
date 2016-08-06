@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block 'main' %}
+    <h3>Organizations</h3>
+    <p>These are the organizations in the system.</p>
+
+    <ul>
+    {% for org in view.organizations %}
+        <li>{{ org }}</li>
+    {% endfor %}
+    </ul>
+    
+{% endblock 'main' %}w
