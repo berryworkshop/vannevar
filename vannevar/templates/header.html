@@ -1,9 +1,11 @@
 {% block 'header' %}
-<h2>Vannevar.org</h2>
+<header>
+    <h2>Vannevar.org</h2>
 
-<ul>
-    <li><a href="{% url 'cms:home' %}">Home</a></li>
-    <li><a href="{% url 'cms:articles' %}">Articles</a></li>
-    <li><a href="{% url 'catalog:organizations' %}">Organizations</a></li>
-</ul>
+    <ul>
+        <li><a href="{% url 'cms:home' %}">Home</a></li>
+        <li><a href="{% url 'cms:articles' %}">Articles</a></li>
+        <li><a href="{% url 'catalog:organizations' %}">Organizations</a></li>
+    </ul>
+</header>
 {% endblock 'header' %}
