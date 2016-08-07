@@ -265,21 +265,17 @@ class Organization(Item):
         return reverse('catalog:organization', args=[self.slug])
 
     def child_organizations(self):
-        '''
-        Provide all child Organizations of this Organization.
-        '''
+        '''All child Organizations.'''
         return Organization.objects.filter(parent_relation_set__parent=self)
 
     def parent_organizations(self):
-        '''
-        Provide all parent Organizations of this Organization.
-        '''
+        '''All parent Organizations.'''
         return Organization.objects.filter(child_relation_set__parent=self)
 
 
 class OrgOrgRelationship(models.Model):
     '''
-    Construction for an organization web.
+    Rels. for an organization web.
     '''
     class Meta:
         verbose_name='organization relationship'

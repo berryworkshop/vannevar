@@ -3,8 +3,8 @@
 {% block 'main' %}
     <h3>Organizations</h3>
 
-    {% with view.organizations_top as orgs %}
-    {% if orgs %}
+    {% with object_list as orgs %}
+    {% if orgs.exists %}
         {% include 'catalog/organization_ul.html' %}
     {% endif %}
     {% endwith %}

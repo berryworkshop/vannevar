@@ -7,14 +7,12 @@ class OrganizationTestCase(TestCase):
     def setUp(self):
         mommy.make(Organization, name='Test Org')
 
-
     def test_org_str(self):
         '''
         Organizations provide accurate string representation.
         '''
         org = Organization.objects.get(name="Test Org")
         self.assertEqual(org.__str__(), 'Test Org')
-
 
     def test_org_to_json(self):
         '''
