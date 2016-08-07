@@ -3,9 +3,12 @@ from django.utils.timezone import now
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.core.validators import MaxValueValidator
+from django.core.urlresolvers import reverse
+
 
 from .controlled_vocabularies import contact_categories, iso_3166_1_alpha_3
 from taggit.managers import TaggableManager
+
 
 #
 # Main
@@ -257,6 +260,9 @@ class Organization(Item):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('catalog:organization', args=[self.slug])
 
     def child_organizations(self):
         '''

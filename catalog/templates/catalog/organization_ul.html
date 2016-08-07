@@ -1,9 +1,9 @@
 {% comment %}
 Recursive organization display.
 {% endcomment %}
-<ul>
+<ul class="organizations">
     {% for org in orgs %}
-        <li>{{ org }}</li>
+        <li class="organization"><a href="{{ org.get_absolute_url }}">{{ org }}</a></li>
         {% with org.child_organizations as orgs %}
         {% if orgs %}
             {% include 'catalog/organization_ul.html' %}
