@@ -4,10 +4,12 @@
     <h3>Organizations</h3>
     <p>These are the organizations in the system.</p>
 
-    <ul>
-    {% for org in view.organizations %}
-        <li>{{ org }}</li>
-    {% endfor %}
-    </ul>
+    <div class="nested_organization_list">
+    {% with view.organizations_top as orgs %}
+        {% if orgs %}
+            {% include 'catalog/organization_ul.html' %}
+        {% endif %}
+    {% endwith %}
+    </div>
     
 {% endblock 'main' %}w

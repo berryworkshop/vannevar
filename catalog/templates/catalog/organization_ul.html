@@ -1,0 +1,13 @@
+{% comment %}
+Recursive organization display.
+{% endcomment %}
+<ul>
+    {% for org in orgs %}
+        <li>{{ org }}</li>
+        {% with org.child_organizations as orgs %}
+        {% if orgs %}
+            {% include 'catalog/organization_ul.html' %}
+        {% endif %}
+        {% endwith %}
+    {% endfor %}
+</ul>

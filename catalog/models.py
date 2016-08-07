@@ -258,6 +258,18 @@ class Organization(Item):
     def __str__(self):
         return self.name
 
+    def child_organizations(self):
+        '''
+        Provide all child Organizations of this Organization.
+        '''
+        return Organization.objects.filter(parent_relation_set__parent=self)
+
+    def parent_organizations(self):
+        '''
+        Provide all parent Organizations of this Organization.
+        '''
+        return Organization.objects.filter(child_relation_set__parent=self)
+
 
 class OrgOrgRelationship(models.Model):
     '''
@@ -268,12 +280,12 @@ class OrgOrgRelationship(models.Model):
 
     parent = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
-        related_name='parents',
+        related_name='child_relation_set', # from related parent
         help_text="Select a parent Organization.",
         )
     child = models.ForeignKey('Organization',
         on_delete=models.CASCADE,
-        related_name='children',
+        related_name='parent_relation_set', # from related child
         help_text="Select a child Organization.",
         )
     CATEGORIES = (
