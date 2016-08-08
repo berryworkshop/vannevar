@@ -18,6 +18,12 @@ class HomeTest(TestCase):
         '''
         self.assertEqual(self.response.status_code, 200)
 
+    def test_template_used_is_home(self):
+        '''
+        Response should use the correct template.
+        '''
+        self.assertTemplateUsed(self.response, 'cms/home.html')
+
 
 class CatalogOrganizationsTest(TestCase):
 
@@ -26,15 +32,15 @@ class CatalogOrganizationsTest(TestCase):
         Create some organizations to use in tests, and a test client.
         '''
         self.orgs = [
-            'The Art Institute of Chicago',
-            'The University of Illinois at Chicago',
-            'Online Computer Library Center, Inc.',
+            {'name': 'The Art Institute of Chicago'},
+            {'name': 'The University of Illinois at Chicago'},
+            {'name': 'Online Computer Library Center, Inc.'},
         ]
         for org in self.orgs:
-            mommy.make(Organization, name=org)
+            mommy.make(Organization, name=org['name'])
 
         self.client = Client()
-        self.response = self.client.get('/organizations/')
+        self.response = self.client.get('/catalog/organizations/')
 
     def test_index_response(self):
         '''
@@ -48,21 +54,4 @@ class CatalogOrganizationsTest(TestCase):
         '''
         self.assertTemplateUsed(self.response, 'catalog/organizations.html')
 
-    def test_organizations_headline(self):
-        '''
-        Page should have the correct heading.
-        '''
-        self.assertContains(self.response,
-            '<h1>List of Organizations.</h1>',
-            html=True,
-            )
 
-    def test_organizations_list(self):
-        '''
-        Page should have an accurate list of Organizations.
-        '''
-        for org in self.orgs:
-            self.assertContains(self.response,
-                '<li>{}</li>'.format(org),
-                html=True
-                )
