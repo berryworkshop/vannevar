@@ -1,10 +1,10 @@
 from django.conf.urls import include, url
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 from catalog import urls as catalog_urls
 from cms import urls as cms_urls
-
 
 urlpatterns = [
     url(r'^django-admin/', include(admin.site.urls)),

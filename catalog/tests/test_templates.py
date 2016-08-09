@@ -60,7 +60,7 @@ class CatalogOrganizationsTest(TestCase):
         '''
         orgs = Organization.objects.all()
         for org in orgs:
-            response = self.client.get('/catalog/organizations/{}/'.format(org.slug))
+            response = self.client.get('/catalog/organizations/{}'.format(org.slug))
             try:
                 self.assertEqual(response.status_code, 200)
             except AssertionError as e:
@@ -69,13 +69,17 @@ class CatalogOrganizationsTest(TestCase):
 
     def test_org_page_templates(self):
         '''
-        Individual Organization templates should be correct.
+        Individual Organization pages should use the organization template.
         '''
-        orgs = Organization.objects.all()
-        for org in orgs:
-            response = self.client.get('/catalog/organizations/{}/'.format(org.slug))
-            try:
-                self.assertTemplateUsed(response, 'catalog/organization.html')
-            except AssertionError as e:
-                raise AssertionError(
-                    '{}: {} is not using the right template'.format(e, org))
+        org = Organization.objects.get(slug="artic")
+        response = self.client.get('/catalog/organizations/{}'.format(org.slug))
+        self.assertTemplateUsed(response, 'catalog/organization.html')
+
+    def test_org_json(self):
+        '''
+        Organization.json pages should load and use the JSON API.
+        '''
+        org = Organization.objects.get(slug="artic")
+        response = self.client.get('/catalog/organizations/{}?format=json'.format(org.slug))
+        self.assertEqual(response.status_code, 200)
+
