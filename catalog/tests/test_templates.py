@@ -32,26 +32,50 @@ class CatalogOrganizationsTest(TestCase):
         Create some organizations to use in tests, and a test client.
         '''
         self.orgs = [
-            {'name': 'The Art Institute of Chicago'},
-            {'name': 'The University of Illinois at Chicago'},
-            {'name': 'Online Computer Library Center, Inc.'},
+            {'name': 'The Art Institute of Chicago', 'slug': 'artic'},
+            {'name': 'The University of Illinois at Chicago', 'slug': 'uic'},
+            {'name': 'Online Computer Library Center, Inc.', 'slug': 'oclc'},
         ]
         for org in self.orgs:
-            mommy.make(Organization, name=org['name'])
+            mommy.make(Organization, name=org['name'], slug=org['slug'])
 
-        self.client = Client()
+        client = Client()
         self.response = self.client.get('/catalog/organizations/')
 
-    def test_index_response(self):
+    def test_orgs_index(self):
         '''
-        Response should be successful.
+        Index page should load.
         '''
         self.assertEqual(self.response.status_code, 200)
 
-    def test_template_used_is_organizations(self):
+    def test_orgs_index(self):
         '''
-        Response should use the correct template.
+        Response should use correct template.
         '''
         self.assertTemplateUsed(self.response, 'catalog/organizations.html')
 
+    def test_org_pages(self):
+        '''
+        Individual Organization pages should load.
+        '''
+        orgs = Organization.objects.all()
+        for org in orgs:
+            response = self.client.get('/catalog/organizations/{}/'.format(org.slug))
+            try:
+                self.assertEqual(response.status_code, 200)
+            except AssertionError as e:
+                raise AssertionError(
+                    '{}: "/catalog/organizations/{}/"'.format(e, org.slug))
 
+    def test_org_page_templates(self):
+        '''
+        Individual Organization templates should be correct.
+        '''
+        orgs = Organization.objects.all()
+        for org in orgs:
+            response = self.client.get('/catalog/organizations/{}/'.format(org.slug))
+            try:
+                self.assertTemplateUsed(response, 'catalog/organization.html')
+            except AssertionError as e:
+                raise AssertionError(
+                    '{}: {} is not using the right template'.format(e, org))
