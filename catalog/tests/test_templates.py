@@ -59,14 +59,6 @@ class CatalogOrganizationsTest(TestCase):
         self.assertTrue(response.json())
         self.assertTrue(len(response.json()) > 1)
 
-    # def test_org_not_same_as_json(self):
-    #     '''
-    #     Organization.json pages should not be the same as regular Org pages.
-    #     '''
-    #     org = Organization.objects.get(slug="artic")
-    #     response = self.client.get('/catalog/organizations/?format=json')
-    #     response_incorrect = self.client.get('/catalog/organizations/')
-    #     self.assertNotEqual(response.rendered_content, response_incorrect.rendered_content)
 
 class CatalogSingleOrganizationTest(TestCase):
 
@@ -90,25 +82,17 @@ class CatalogSingleOrganizationTest(TestCase):
 
     def test_page(self):
         '''
-        Individual Organization pages should load.
+        Organization page should load, be unique, and use the correct template.
         '''
-        orgs = Organization.objects.all()
-        for org in orgs:
-            try:
-                self.assertEqual(self.response.status_code, 200)
-            except AssertionError as e:
-                raise AssertionError(
-                    '{}: "/catalog/organizations/{}/"'.format(e, self.org.slug))
-
-    def test_templates(self):
-        '''
-        Individual Organization pages should use the organization template.
-        '''
+        self.assertEqual(self.response.status_code, 200)
+        second_response = self.client.get(
+            '/catalog/organizations/{}'.format('oclc'))
+        self.assertNotEqual(self.response.content, second_response.content)
         self.assertTemplateUsed(self.response, 'catalog/organization.html')
 
     def test_json(self):
         '''
-        Single Organization.json pages should load, be JSON, and be a single record.
+        Organization.json pages should load, be JSON, and be a single record.
         '''
         json_response = self.client.get('/catalog/organizations/{}?format=json'.format(self.org.slug))
         self.assertEqual(json_response.status_code, 200)
