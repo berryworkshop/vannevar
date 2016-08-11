@@ -52,7 +52,8 @@ class CatalogOrganizationsTest(TestCase):
 
     def test_json(self):
         '''
-        Organizations index json pages should load, be JSON, and be longer than a single record.
+        Organizations index json pages should load, be JSON,
+        and be longer than a single record.
         '''
         response = self.client.get('/organizations/?format=json')
         self.assertEqual(response.status_code, 200)
@@ -94,7 +95,9 @@ class CatalogSingleOrganizationTest(TestCase):
         '''
         Organization.json pages should load, be JSON, and be a single record.
         '''
-        json_response = self.client.get('/organizations/{}?format=json'.format(self.org.slug))
+        json_response = self.client.get(
+            '/organizations/{}?format=json'.format(self.org.slug))
         self.assertEqual(json_response.status_code, 200)
         self.assertTrue(json_response.json())
+        self.assertEqual(json_response['Content-Type'], 'application/json')
         self.assertTrue(len(json_response.json()) == 1)

@@ -1,0 +1,23 @@
+{
+  "name": "vannevar",
+  "version": "0.0.1",
+  "description": "\"A collection of organizations, people, and tools used in the Library, Archives, and Museum fields.\"",
+  "main": "index.js",
+  "dependencies": {
+    "normalize.css": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "coverage run ./manage.py test && coverage report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berryworkshop/vannevar.git"
+  },
+  "author": "Allan Berry",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/berryworkshop/vannevar/issues"
+  },
+  "homepage": "https://github.com/berryworkshop/vannevar#readme"
+}

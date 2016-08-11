@@ -3,10 +3,13 @@
 {% block 'main' %}
     <h3>Organizations</h3>
 
+    {% comment %}
+    <!-- Remove when React.js functional -->
     {% with object_list as orgs %}
     {% if orgs.exists %}
         {% include 'catalog/organization_ul.html' %}
     {% endif %}
     {% endwith %}
+    {% endcomment %}
     
 {% endblock 'main' %}w
