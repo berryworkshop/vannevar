@@ -8,7 +8,7 @@ from cms import urls as cms_urls
 
 urlpatterns = [
     url(r'^django-admin/', include(admin.site.urls)),
-    url(r'^catalog/', include(catalog_urls, namespace='catalog')),
+    url(r'^', include(catalog_urls, namespace='catalog')),
     url(r'^', include(cms_urls, namespace='cms')),
 ]
 

@@ -41,7 +41,7 @@ class CatalogOrganizationsTest(TestCase):
             mommy.make(Organization, name=org['name'], slug=org['slug'])
 
         client = Client()
-        self.response = self.client.get('/catalog/organizations/')
+        self.response = self.client.get('/organizations/')
 
     def test_page(self):
         '''
@@ -54,7 +54,7 @@ class CatalogOrganizationsTest(TestCase):
         '''
         Organizations index json pages should load, be JSON, and be longer than a single record.
         '''
-        response = self.client.get('/catalog/organizations/?format=json')
+        response = self.client.get('/organizations/?format=json')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json())
         self.assertTrue(len(response.json()) > 1)
@@ -78,7 +78,7 @@ class CatalogSingleOrganizationTest(TestCase):
         client = Client()
         self.org = Organization.objects.get(slug="artic")
         self.response = self.client.get(
-            '/catalog/organizations/{}'.format(self.org.slug))
+            '/organizations/{}'.format(self.org.slug))
 
     def test_page(self):
         '''
@@ -86,7 +86,7 @@ class CatalogSingleOrganizationTest(TestCase):
         '''
         self.assertEqual(self.response.status_code, 200)
         second_response = self.client.get(
-            '/catalog/organizations/{}'.format('oclc'))
+            '/organizations/{}'.format('oclc'))
         self.assertNotEqual(self.response.content, second_response.content)
         self.assertTemplateUsed(self.response, 'catalog/organization.html')
 
@@ -94,7 +94,7 @@ class CatalogSingleOrganizationTest(TestCase):
         '''
         Organization.json pages should load, be JSON, and be a single record.
         '''
-        json_response = self.client.get('/catalog/organizations/{}?format=json'.format(self.org.slug))
+        json_response = self.client.get('/organizations/{}?format=json'.format(self.org.slug))
         self.assertEqual(json_response.status_code, 200)
         self.assertTrue(json_response.json())
         self.assertTrue(len(json_response.json()) == 1)
