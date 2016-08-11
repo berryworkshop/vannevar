@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block 'main' %}
-    <h3>Organizations</h3>
-
+    <main id="main_content">
+        <h3>Organizations</h3>
+    
     {% comment %}
     <!-- Remove when React.js functional -->
     {% with object_list as orgs %}
@@ -11,5 +12,6 @@
     {% endif %}
     {% endwith %}
     {% endcomment %}
+    </main>
     
 {% endblock 'main' %}w

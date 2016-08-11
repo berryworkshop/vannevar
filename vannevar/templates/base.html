@@ -12,11 +12,13 @@
 <body>
     {% include 'header.html' %}
     {% block 'main' %}
-        <main>
+        <main id="main_content">
             <h3>Base Template</h3>
             <p>This is default Base template text.</p>
         </main>
     {% endblock 'main' %}
     {% include 'footer.html' %}
+    
+    <script src="{% static 'base.js' %}"></script>
 </body>
 </html>
