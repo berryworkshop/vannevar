@@ -1,0 +1,35 @@
+{
+  "name": "vannevar",
+  "version": "0.1.0",
+  "description": "A catalog of Libraries, Archives and Museums.",
+  "main": "manage.py",
+  "scripts": {
+    "test": "./manage.py test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berryworkshop/vannevar.git"
+  },
+  "keywords": [
+    "archive",
+    "library",
+    "museum",
+    "catalog"
+  ],
+  "author": "Allan Berry, the Berry Catalog Workshop",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/berryworkshop/vannevar/issues"
+  },
+  "homepage": "https://github.com/berryworkshop/vannevar#readme",
+  "dependencies": {
+    "normalize.css": "^4.2.0",
+    "react": "^15.3.0"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "gulp": "^3.9.1",
+    "gulp-concat-css": "^2.3.0",
+    "gulp-sass": "^2.3.2"
+  }
+}
