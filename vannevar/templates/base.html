@@ -5,9 +5,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Vannevar</title>
-    <link rel="stylesheet" href="{% static 'node_modules/normalize.css/normalize.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro">
-    <link rel="stylesheet" href="{% static 'vannevar/css/base.css' %}">
+    <script src="{% static 'vannevar/js/vendors.min.js' %}"></script>
 </head>
 <body>
     {% include 'header.html' %}
@@ -18,7 +17,6 @@
         </main>
     {% endblock 'main' %}
     {% include 'footer.html' %}
-    
-    <script src="{% static 'base.js' %}"></script>
+
 </body>
 </html>

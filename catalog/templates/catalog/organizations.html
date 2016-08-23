@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block 'main' %}
     <main id="main_content">
@@ -12,6 +13,10 @@
     {% endif %}
     {% endwith %}
     {% endcomment %}
+
+    <div id="example"></div>
+
+    <script src="{% static 'catalog/dist/base.js' %}"></script>
     </main>
     
 {% endblock 'main' %}w

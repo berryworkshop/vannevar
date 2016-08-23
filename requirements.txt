@@ -12,6 +12,7 @@ django-toolbelt==0.0.1
 django-treebeard==4.0.1
 gunicorn==19.6.0
 html5lib==0.9999999
+invoke==0.13.0
 model-mommy==1.2.6
 Pillow==3.3.0
 psycopg2==2.6.2
